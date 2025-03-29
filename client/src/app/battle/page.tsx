@@ -50,6 +50,11 @@ interface BattleState {
   currentBattle: number
 }
 
+interface PlayerInfo {
+  socketId: string
+  type: string
+}
+
 export default function BattlePage() {
   // WebSocket connection
   const socketRef = useRef<Socket | null>(null)
@@ -60,6 +65,9 @@ export default function BattlePage() {
   const [showConnectionDialog, setShowConnectionDialog] = useState(false)
   const [showRoomDialog, setShowRoomDialog] = useState(false)
   const [roomCodeInput, setRoomCodeInput] = useState("")
+  const [mySocketId, setMySocketId] = useState<string | null>(null)
+  const [opponentSocketId, setOpponentSocketId] = useState<string | null>(null)
+  const [playersInRoom, setPlayersInRoom] = useState<string[]>([])
 
   // Battle state
   const [battleState, setBattleState] = useState<BattleState>({
@@ -108,6 +116,7 @@ export default function BattlePage() {
     // Event listeners
     socket.on("connect", () => {
       setIsConnected(true)
+      setMySocketId(socket?.id)
       addBattleLog("• Connected to battle server")
     })
 
@@ -115,6 +124,8 @@ export default function BattlePage() {
       setIsConnected(false)
       addBattleLog("• Disconnected from battle server")
     })
+    
+    
 
     socket.on("room_joined", (data: { roomId: string; isSpectator: boolean }) => {
       setRoomId(data.roomId)
@@ -139,6 +150,18 @@ export default function BattlePage() {
 
     socket.on("bet_update", (amount: number) => {
       setTotalBetAmount(amount)
+    })
+
+    socket.on("room-players", (playerList: string[]) => {
+      setPlayersInRoom(playerList)
+
+      // Find opponent socket ID (the one that's not mine)
+      if (playerList.length === 2) {
+        const opponent = playerList.find((id) => id !== socket.id)
+        if (opponent) {
+          setOpponentSocketId(opponent)
+        }
+      }
     })
 
     socket.on("round_start", () => {
@@ -445,6 +468,12 @@ export default function BattlePage() {
     setIsSpectatorMode(!isSpectatorMode)
   }
 
+  // Format socket ID for display (shortened version)
+  const formatSocketId = (socketId: string | null) => {
+    if (!socketId) return "Unknown"
+    return socketId.substring(0, 6) + "..." + socketId.substring(socketId.length - 4)
+  }
+
   return (
     <div className="min-h-screen bg-[#0a0a1a] text-gray-100 relative overflow-hidden pt-16">
       {/* Magical sigils on the ground */}
@@ -694,7 +723,7 @@ export default function BattlePage() {
                     height={20}
                     className="rounded-full mr-2"
                   />
-                  Archmage Lumina
+                  {formatSocketId(mySocketId)}
                 </h3>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
@@ -717,7 +746,7 @@ export default function BattlePage() {
                     height={20}
                     className="rounded-full mr-2"
                   />
-                  Sorcerer Malachai
+                  {formatSocketId(opponentSocketId) || "Waiting for opponent..."}
                 </h3>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
@@ -737,10 +766,10 @@ export default function BattlePage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700">
-                  Bet on Archmage Lumina
+                  Bet on {formatSocketId(mySocketId)}
                 </Button>
                 <Button className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700">
-                  Bet on Sorcerer Malachai
+                  Bet on {formatSocketId(opponentSocketId) || "Opponent"}
                 </Button>
               </div>
             )}
@@ -776,7 +805,7 @@ export default function BattlePage() {
                 />
               </div>
               <div className="text-center">
-                <p className="font-medium">Archmage Lumina</p>
+                <p className="font-medium">{formatSocketId(mySocketId)}</p>
                 <p className="text-xs text-purple-400">Phoenix Patronus • Elder Wand</p>
               </div>
             </div>
@@ -962,7 +991,7 @@ export default function BattlePage() {
                 />
               </div>
               <div className="text-center">
-                <p className="font-medium">Sorcerer Malachai</p>
+                <p className="font-medium">{formatSocketId(opponentSocketId) || "Waiting for opponent..."}</p>
                 <p className="text-xs text-red-400">Wolf Patronus • Dragon Heartstring Wand</p>
               </div>
             </div>
@@ -1054,11 +1083,11 @@ export default function BattlePage() {
                   />
                 ))}
               </div>
-              <span>Archmage Lumina</span>
+              <span>{formatSocketId(mySocketId)}</span>
             </div>
             <div className="text-gray-400">vs</div>
             <div className="flex items-center">
-              <span>Sorcerer Malachai</span>
+              <span>{formatSocketId(opponentSocketId) || "Opponent"}</span>
               <div className="flex ml-2">
                 {[...Array(2)].map((_, i) => (
                   <Heart
@@ -1109,7 +1138,7 @@ export default function BattlePage() {
 
           <div className="text-center mb-6">
             <p className="text-lg font-medium mb-2">
-              {battleWinner === "player" ? "Congratulations, Archmage!" : "Better luck next time, Wizard!"}
+              {battleWinner === "player" ? "Congratulations, Wizard!" : "Better luck next time, Wizard!"}
             </p>
             <p className="text-gray-400">
               {battleWinner === "player"
