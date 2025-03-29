@@ -112,30 +112,15 @@ contract Marketplace {
     }
 
     /// @notice Purchase a Professor mystery box to receive a ProfessorSnape Shard
-    function purchaseProfessorBox() external {
+    function purchaseProfessorBox(uint256 shardID) external {
         require(
             runesToken.transferFrom(msg.sender, address(this), professorBoxPrice),
             "Payment failed"
         );
 
-        gameItems.mint(msg.sender, PROFESSOR_SNAPE_SHARD_ID, 1);
+        gameItems.mint(msg.sender, shardID, 1);
 
-        emit ProfessorBoxPurchased(msg.sender, PROFESSOR_SNAPE_SHARD_ID, 1);
-    }
-
-    /// @notice Exchange 4 ProfessorSnape Shards for the ProfessorSnape SFT
-    function mintProfessorSnape() external {
-        uint256 requiredShards = 4;
-
-        require(
-            gameItems.getBalanceOf(msg.sender, PROFESSOR_SNAPE_SHARD_ID) >= requiredShards,
-            "Not enough shards"
-        );
-
-        gameItems.burn(msg.sender, PROFESSOR_SNAPE_SHARD_ID, requiredShards);
-        gameItems.mint(msg.sender, PROFESSOR_SNAPE_ID, 1);
-
-        emit ProfessorSnapeMinted(msg.sender);
+        emit ProfessorBoxPurchased(msg.sender, shardID, 1);
     }
 
     /// @notice Withdraw Runes from the contract
