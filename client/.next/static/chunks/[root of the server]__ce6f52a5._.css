@@ -1401,6 +1401,10 @@
     background-color: #0a0a1a;
   }
 
+  .bg-accent {
+    background-color: hsl(var(--accent));
+  }
+
   .bg-amber-500\/20 {
     background-color: color-mix(in oklab, var(--color-amber-500) 20%, transparent);
   }
@@ -1631,6 +1635,10 @@
 
   .bg-purple-900\/50 {
     background-color: color-mix(in oklab, var(--color-purple-900) 50%, transparent);
+  }
+
+  .bg-red-500 {
+    background-color: var(--color-red-500);
   }
 
   .bg-red-500\/20 {

@@ -1,8 +1,13 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
   "/badges/page": "app/badges/page.js",
+  "/battle/page": "app/battle/page.js",
+  "/collection/page": "app/collection/page.js",
+  "/deck/page": "app/deck/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/page": "app/page.js",
   "/patronus/page": "app/patronus/page.js",
+  "/profile/page": "app/profile/page.js",
   "/quiz/page": "app/quiz/page.js",
   "/spectate/page": "app/spectate/page.js"
 }
