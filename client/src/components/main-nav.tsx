@@ -1,12 +1,35 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
+import { useAccount,useConfig,useReadContract } from "wagmi"
+import { RuneAbi,RuneAdress } from "../app/abi/RuneAbi"
 import { usePathname } from "next/navigation"
 import { Wand2, BookOpen, Swords, User, Info, Award, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+
 export function MainNav() {
   const pathname = usePathname()
+  const { isConnected, address } = useAccount()
+  const {
+    data,
+    isLoading,
+    error,
+    refetch,
+  } = useReadContract({
+    address: RuneAdress,
+    abi: RuneAbi,
+    functionName: 'balanceOf',
+    args: [address],
+  })
+
+  const formatBalance = (rawBalance: bigint | undefined) => {
+    if (!rawBalance) return '0'
+    const balanceInEther = Number(rawBalance) / 1e18
+    return balanceInEther.toFixed(4) // Display 4 decimal places
+  }
+
 
   const navItems = [
     {
@@ -82,6 +105,7 @@ export function MainNav() {
             })}
           </div>
           <ConnectButton chainStatus="icon" accountStatus="avatar" />
+          <span>balance is {formatBalance(data as any)}</span>
         </div>
       </div>
     </nav>
