@@ -1,0 +1,140 @@
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+@import "tailwindcss";
+@config "../../tailwind.config.js";
+@layer base {
+	:root {
+		--background: 0 0% 100%;
+		--foreground: 240 10% 3.9%;
+		--card: 0 0% 100%;
+		--card-foreground: 240 10% 3.9%;
+		--popover: 0 0% 100%;
+		--popover-foreground: 240 10% 3.9%;
+		--primary: 262.1 83.3% 57.8%;
+		--primary-foreground: 210 20% 98%;
+		--secondary: 240 4.8% 95.9%;
+		--secondary-foreground: 240 5.9% 10%;
+		--muted: 240 4.8% 95.9%;
+		--muted-foreground: 240 3.8% 46.1%;
+		--accent: 240 4.8% 95.9%;
+		--accent-foreground: 240 5.9% 10%;
+		--destructive: 0 84.2% 60.2%;
+		--destructive-foreground: 0 0% 98%;
+		--border: 240 5.9% 90%;
+		--input: 240 5.9% 90%;
+		--ring: 262.1 83.3% 57.8%;
+		--radius: 0.5rem;
+	}
+
+	.dark {
+		--background: 240 10% 3.9%;
+		--foreground: 0 0% 98%;
+		--card: 240 10% 3.9%;
+		--card-foreground: 0 0% 98%;
+		--popover: 240 10% 3.9%;
+		--popover-foreground: 0 0% 98%;
+		--primary: 262.1 83.3% 57.8%;
+		--primary-foreground: 210 20% 98%;
+		--secondary: 240 3.7% 15.9%;
+		--secondary-foreground: 0 0% 98%;
+		--muted: 240 3.7% 15.9%;
+		--muted-foreground: 240 5% 64.9%;
+		--accent: 240 3.7% 15.9%;
+		--accent-foreground: 0 0% 98%;
+		--destructive: 0 62.8% 30.6%;
+		--destructive-foreground: 0 0% 98%;
+		--border: 240 3.7% 15.9%;
+		--input: 240 3.7% 15.9%;
+		--ring: 262.1 83.3% 57.8%;
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+}
+
+/* Custom scrollbar for the battle log */
+.battle-log::-webkit-scrollbar {
+	width: 4px;
+}
+
+.battle-log::-webkit-scrollbar-track {
+	background: rgba(30, 30, 46, 0.5);
+	border-radius: 10px;
+}
+
+.battle-log::-webkit-scrollbar-thumb {
+	background: rgba(139, 92, 246, 0.3);
+	border-radius: 10px;
+}
+
+.battle-log::-webkit-scrollbar-thumb:hover {
+	background: rgba(139, 92, 246, 0.5);
+}
+
+/* Animations for magical elements */
+@keyframes float {
+	0% {
+		transform: translateY(0px);
+	}
+	50% {
+		transform: translateY(-10px);
+	}
+	100% {
+		transform: translateY(0px);
+	}
+}
+
+@keyframes pulse {
+	0% {
+		opacity: 0.3;
+	}
+	50% {
+		opacity: 0.7;
+	}
+	100% {
+		opacity: 0.3;
+	}
+}
+
+.float {
+	animation: float 6s ease-in-out infinite;
+}
+
+.pulse {
+	animation: pulse 3s ease-in-out infinite;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+	display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+}
+
+/* Badge glow animations */
+@keyframes badgeGlow {
+	0% {
+		box-shadow: 0 0 5px rgba(139, 92, 246, 0.3);
+	}
+	50% {
+		box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+	}
+	100% {
+		box-shadow: 0 0 5px rgba(139, 92, 246, 0.3);
+	}
+}
+
+.badge-glow {
+	animation: badgeGlow 3s ease-in-out infinite;
+}
