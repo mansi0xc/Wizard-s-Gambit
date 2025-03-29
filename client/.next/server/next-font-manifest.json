@@ -1,28 +1,24 @@
 {
   "app": {
     "[project]/src/app/_not-found/page": [
-      "static/media/8vIJ7ww63mVu7gt79mT7PkRXMw-s.p.ada44f3a.woff2",
-      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.7b3669ea.woff2"
+      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.7b3669ea.woff2",
+      "static/media/8vIJ7ww63mVu7gt79mT7PkRXMw-s.p.ada44f3a.woff2"
     ],
-    "[project]/src/app/battle/page": [
-      "static/media/8vIJ7ww63mVu7gt79mT7PkRXMw-s.p.ada44f3a.woff2",
-      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.7b3669ea.woff2"
+    "[project]/src/app/badges/page": [
+      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.7b3669ea.woff2",
+      "static/media/8vIJ7ww63mVu7gt79mT7PkRXMw-s.p.ada44f3a.woff2"
     ],
-    "[project]/src/app/collection/page": [
-      "static/media/8vIJ7ww63mVu7gt79mT7PkRXMw-s.p.ada44f3a.woff2",
-      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.7b3669ea.woff2"
+    "[project]/src/app/patronus/page": [
+      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.7b3669ea.woff2",
+      "static/media/8vIJ7ww63mVu7gt79mT7PkRXMw-s.p.ada44f3a.woff2"
     ],
-    "[project]/src/app/deck/page": [
-      "static/media/8vIJ7ww63mVu7gt79mT7PkRXMw-s.p.ada44f3a.woff2",
-      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.7b3669ea.woff2"
-    ],
-    "[project]/src/app/page": [
-      "static/media/8vIJ7ww63mVu7gt79mT7PkRXMw-s.p.ada44f3a.woff2",
-      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.7b3669ea.woff2"
+    "[project]/src/app/quiz/page": [
+      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.7b3669ea.woff2",
+      "static/media/8vIJ7ww63mVu7gt79mT7PkRXMw-s.p.ada44f3a.woff2"
     ],
     "[project]/src/app/spectate/page": [
-      "static/media/8vIJ7ww63mVu7gt79mT7PkRXMw-s.p.ada44f3a.woff2",
-      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.7b3669ea.woff2"
+      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.7b3669ea.woff2",
+      "static/media/8vIJ7ww63mVu7gt79mT7PkRXMw-s.p.ada44f3a.woff2"
     ]
   },
   "appUsingSizeAdjust": true,
