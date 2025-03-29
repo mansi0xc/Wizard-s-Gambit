@@ -110,7 +110,6 @@ contract GameItems is ERC1155, AccessControl, ERC1155Burnable {
             patronusId == stag || patronusId == phoenix || patronusId == otter || patronusId == wolf,
             "Invalid Patronus ID"
         );
-        require(amount > 0, "Amount must be greater than zero");
         _mint(msg.sender, patronusId, 1, uri);
     }
 
