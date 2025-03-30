@@ -5,6 +5,12 @@ import Image from "next/image"
 import Link from "next/link"
 import { io, type Socket } from "socket.io-client"
 import { Shield, Flame, Snowflake, Wind, ArrowLeft, Heart, Users, Trophy, Wifi } from "lucide-react"
+
+import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { io, type Socket } from "socket.io-client"
+import { Shield, Flame, Snowflake, Wind, ArrowLeft, Heart, Users, Trophy, Wifi } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
@@ -513,7 +519,22 @@ useEffect(()=>{
   return (
     <div className="min-h-screen bg-[#0a0a1a] text-gray-100 relative overflow-hidden pt-16">
       {/* Magical sigils on the ground */}
+    <div className="min-h-screen bg-[#0a0a1a] text-gray-100 relative overflow-hidden pt-16">
+      {/* Magical sigils on the ground */}
       <div className="absolute inset-0 z-0">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 border border-purple-900/20 rounded-full"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 border border-purple-900/10 rounded-full"></div>
+        <div className="absolute top-1/4 left-1/4 w-128 h-128 border border-purple-900/5 rounded-full"></div>
+
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl max-h-4xl">
+          <svg viewBox="0 0 100 100" className="w-full h-full opacity-5">
+            <path d="M50 0 L100 50 L50 100 L0 50 Z" fill="none" stroke="rgb(139, 92, 246)" strokeWidth="0.2" />
+            <path d="M50 10 L90 50 L50 90 L10 50 Z" fill="none" stroke="rgb(139, 92, 246)" strokeWidth="0.2" />
+            <circle cx="50" cy="50" r="40" fill="none" stroke="rgb(139, 92, 246)" strokeWidth="0.2" />
+            <circle cx="50" cy="50" r="30" fill="none" stroke="rgb(139, 92, 246)" strokeWidth="0.2" />
+            <circle cx="50" cy="50" r="20" fill="none" stroke="rgb(139, 92, 246)" strokeWidth="0.2" />
+          </svg>
+        </div>
         <div className="absolute top-1/4 left-1/4 w-64 h-64 border border-purple-900/20 rounded-full"></div>
         <div className="absolute top-1/4 left-1/4 w-96 h-96 border border-purple-900/10 rounded-full"></div>
         <div className="absolute top-1/4 left-1/4 w-128 h-128 border border-purple-900/5 rounded-full"></div>
@@ -550,7 +571,34 @@ useEffect(()=>{
             <div className={`w-3 h-3 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`}></div>
             <span className="text-sm font-medium">{isConnected ? "Connected" : "Disconnected"}</span>
           </div>
+      <header className="container mx-auto pt-4 px-4 z-10 relative flex justify-between items-center">
+        <Link href="/deck" className="text-gray-400 hover:text-white transition-colors flex items-center">
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          <span className="text-sm">Return to Deck</span>
+        </Link>
 
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-transparent border-gray-800 hover:bg-gray-800 flex items-center gap-1"
+            onClick={() => setShowConnectionDialog(true)}
+          >
+            <Wifi className="h-3 w-3" />
+            <span>Connect</span>
+          </Button>
+
+          <div className="flex items-center space-x-2 bg-gray-900/50 border border-gray-800 rounded-full px-3 py-1">
+            <div className={`w-3 h-3 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`}></div>
+            <span className="text-sm font-medium">{isConnected ? "Connected" : "Disconnected"}</span>
+          </div>
+
+          <div className="flex items-center space-x-2 bg-gray-900/50 border border-gray-800 rounded-full px-3 py-1">
+            <div className="w-3 h-3 rounded-full bg-purple-500 animate-pulse"></div>
+            <span className="text-sm font-medium">
+              Battle {battleState.currentBattle} • Round {battleState.round}
+            </span>
+          </div>
           <div className="flex items-center space-x-2 bg-gray-900/50 border border-gray-800 rounded-full px-3 py-1">
             <div className="w-3 h-3 rounded-full bg-purple-500 animate-pulse"></div>
             <span className="text-sm font-medium">
@@ -1213,6 +1261,131 @@ useEffect(()=>{
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* Round Result Dialog */}
+      <Dialog open={showRoundResult} onOpenChange={setShowRoundResult}>
+        <DialogContent className="bg-gray-900 border border-gray-800 text-gray-100 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-2xl text-center">
+              Battle {battleState.currentBattle - 1} Complete!
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              {roundWinner === "player" ? (
+                <span className="text-purple-400">You won this battle!</span>
+              ) : roundWinner === "opponent" ? (
+                <span className="text-red-400">Your opponent won this battle!</span>
+              ) : (
+                <span className="text-yellow-400">Battle ended in a tie!</span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex justify-center items-center py-6">
+            {roundWinner === "player" ? (
+              <div className="w-24 h-24 bg-purple-900/30 rounded-full flex items-center justify-center">
+                <Trophy className="h-12 w-12 text-yellow-400" />
+              </div>
+            ) : roundWinner === "opponent" ? (
+              <div className="w-24 h-24 bg-red-900/30 rounded-full flex items-center justify-center">
+                <Shield className="h-12 w-12 text-red-400" />
+              </div>
+            ) : (
+              <div className="w-24 h-24 bg-yellow-900/30 rounded-full flex items-center justify-center">
+                <Shield className="h-12 w-12 text-yellow-400" />
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-between items-center px-4 py-2 bg-gray-800/50 rounded-lg mb-4">
+            <div className="flex items-center">
+              <div className="flex mr-2">
+                {[...Array(2)].map((_, i) => (
+                  <Heart
+                    key={i}
+                    className={`h-5 w-5 ${i < (2 - battleState.playerWins) ? "text-red-500 fill-red-500" : "text-gray-600"} mr-1`}
+                  />
+                ))}
+              </div>
+              <span>{formatSocketId(mySocketId)}</span>
+            </div>
+            <div className="text-gray-400">vs</div>
+            <div className="flex items-center">
+              <span>{formatSocketId(opponentSocketId) || "Opponent"}</span>
+              <div className="flex ml-2">
+                {[...Array(2)].map((_, i) => (
+                  <Heart
+                    key={i}
+                    className={`h-5 w-5 ${i < (2 - battleState.opponentWins) ? "text-red-500 fill-red-500" : "text-gray-600"} ml-1`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              onClick={continueToNextRound}
+            >
+              Continue to Battle {battleState.currentBattle}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Battle Result Dialog */}
+      <Dialog open={showBattleResult} onOpenChange={setShowBattleResult}>
+        <DialogContent className="bg-gray-900 border border-gray-800 text-gray-100 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-2xl text-center">Duel Complete!</DialogTitle>
+            <DialogDescription className="text-center">
+              {battleWinner === "player" ? (
+                <span className="text-purple-400">Victory! You have defeated your opponent!</span>
+              ) : (
+                <span className="text-red-400">Defeat! Your opponent has bested you!</span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex justify-center items-center py-8">
+            {battleWinner === "player" ? (
+              <div className="w-32 h-32 bg-purple-900/30 rounded-full flex items-center justify-center">
+                <Trophy className="h-16 w-16 text-yellow-400" />
+              </div>
+            ) : (
+              <div className="w-32 h-32 bg-red-900/30 rounded-full flex items-center justify-center">
+                <Shield className="h-16 w-16 text-red-400" />
+              </div>
+            )}
+          </div>
+
+          <div className="text-center mb-6">
+            <p className="text-lg font-medium mb-2">
+              {battleWinner === "player" ? "Congratulations, Wizard!" : "Better luck next time, Wizard!"}
+            </p>
+            <p className="text-gray-400">
+              {battleWinner === "player"
+                ? "Your mastery of the arcane arts has proven superior."
+                : "Even the greatest wizards face defeat. Learn and grow stronger."}
+            </p>
+          </div>
+
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              className="flex-1 bg-transparent border-gray-700 hover:bg-gray-800"
+              onClick={endBattle}
+            >
+              Return to Deck
+            </Button>
+            <Button
+              className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              onClick={resetBattle}
+            >
+              Duel Again
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <script
         dangerouslySetInnerHTML={{
@@ -1228,7 +1401,18 @@ useEffect(()=>{
               
               button.addEventListener('mouseleave', () => {
                 button.style.transform = 'translateY(0)';
+            // Add subtle hover effects to spell buttons
+            const spellButtons = document.querySelectorAll('button');
+            spellButtons.forEach(button => {
+              button.addEventListener('mouseenter', () => {
+                button.style.transform = 'translateY(-2px)';
+                button.style.transition = 'all 0.2s ease';
               });
+              
+              button.addEventListener('mouseleave', () => {
+                button.style.transform = 'translateY(0)';
+              });
+            });
             });
           });
         `,
