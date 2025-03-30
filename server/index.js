@@ -52,9 +52,6 @@ io.on("connection", (socket) => {
     }
   })
 
-  socket.on("player_details",(roomId) => {
-    sendPlayerDetails(roomId);
-  })
   // Handle game actions
   socket.on("cast_spell", (data) => {
     
