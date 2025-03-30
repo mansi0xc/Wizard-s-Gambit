@@ -200,6 +200,24 @@ export default function BuyItemsPage() {
       setProcessingItem(null)
     }
   }
+  async function handleUpgradeSpell(oldid: number, newid: number, cardid:number, wandid: number, uri: string) {
+    try {
+      setProcessingItem(`spell-${oldid}`)
+      const result = await writeContract(config, {
+        abi: GameItemsABI,
+        address: GameItemsAddress,
+        functionName: "upgradeSpell",
+        args: [oldid, newid, cardid, wandid, uri],
+      })
+      await waitForTransactionReceipt(config, { hash: result })
+      alert(`Successfully upgraded Spell #${oldid}`)
+    } catch (error) {
+      console.error("Error upgrading spell:", error)
+      alert("Failed to upgrade Spell. See console for details.")
+    } finally {
+      setProcessingItem(null)
+    }
+  }
 
   async function handlemintWand(wandid: number, amount: number, uri: string) {
     try {

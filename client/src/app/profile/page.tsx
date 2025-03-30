@@ -1,414 +1,503 @@
-import Image from "next/image"
-import {
-  Trophy,
-  Star,
-  Clock,
-  Flame,
-  Shield,
-  Zap,
-  Award,
-  Sparkles,
-  BarChart3,
-  BookOpen,
-  Swords,
-  Wand2,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+"use client"
 
-export default function ProfilePage() {
-  // Sample user data
-  const user = {
-    name: "Archmage Lumina",
-    title: "Master of Arcane Arts",
-    level: 42,
-    experience: 7850,
-    nextLevelExp: 8500,
-    joinDate: "March 15, 2023",
-    avatar: "/placeholder.svg?height=200&width=200",
-    banner: "/placeholder.svg?height=400&width=1200",
-    stats: {
-      wins: 187,
-      losses: 43,
-      draws: 12,
-      winRate: 81,
-      totalMatches: 242,
-      longestWinStreak: 14,
-      currentWinStreak: 5,
-    },
-    achievements: [
-      {
-        id: 1,
-        name: "First Victory",
-        description: "Win your first duel",
-        icon: Trophy,
-        completed: true,
-        date: "Mar 16, 2023",
-      },
-      {
-        id: 2,
-        name: "Collector",
-        description: "Collect 10 different wands",
-        icon: Wand2,
-        completed: true,
-        date: "Apr 2, 2023",
-      },
-      {
-        id: 3,
-        name: "Undefeated",
-        description: "Win 10 duels in a row",
-        icon: Star,
-        completed: true,
-        date: "May 10, 2023",
-      },
-      { id: 4, name: "Archmage", description: "Reach level 40", icon: Sparkles, completed: true, date: "Jul 22, 2023" },
-      {
-        id: 5,
-        name: "Legendary",
-        description: "Collect a legendary wand",
-        icon: Award,
-        completed: true,
-        date: "Aug 5, 2023",
-      },
-      { id: 6, name: "Grand Master", description: "Win 500 duels", icon: Trophy, completed: false, progress: 37 },
-    ],
-    recentMatches: [
-      { id: 1, opponent: "Sorcerer Malachai", result: "win", date: "2 hours ago" },
-      { id: 2, opponent: "Enchantress Elara", result: "win", date: "5 hours ago" },
-      { id: 3, opponent: "Warlock Thorne", result: "win", date: "Yesterday" },
-      { id: 4, opponent: "Mystic Orion", result: "loss", date: "2 days ago" },
-      { id: 5, opponent: "Illusionist Zephyr", result: "win", date: "3 days ago" },
-    ],
-    favoriteSpells: [
-      { name: "Stupefy", uses: 342, winRate: 78 },
-      { name: "Protego", uses: 289, winRate: 92 },
-      { name: "Incendio", uses: 201, winRate: 75 },
-      { name: "Expelliarmus", uses: 187, winRate: 81 },
-    ],
+import React from "react"
+
+import { useState, useEffect } from "react"
+import { useAccount } from "wagmi"
+import { writeContract, waitForTransactionReceipt, readContract } from "@wagmi/core"
+import { PlayerAvatarAbi, PlayerAvatarAddress } from "../abi/PlayerAvatarAbi"
+import { config } from "../wagmi"
+import { Loader2, Wand, Shield, Book, Leaf } from "lucide-react"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Textarea } from "@/components/ui/textarea"
+
+// Pinata IPFS gateway URL
+const baseUrl = "https://scarlet-urgent-pig-985.mypinata.cloud/ipfs/"
+
+// House metadata and URIs
+const houseData = {
+  gryffindor: {
+    name: "Gryffindor",
+    color: "bg-red-600",
+    textColor: "text-red-600",
+    borderColor: "border-red-600",
+    icon: Shield,
+    // CIDs for house images on IPFS
+    imageCid: "QmNTESVhTmFqV3qSECGNXYbFVGvnJfGw3TDNEcmBmzxVRT",
+    description: "Brave, daring, and chivalrous. Gryffindors are known for their courage and determination.",
+  },
+  slytherin: {
+    name: "Slytherin",
+    color: "bg-green-600",
+    textColor: "text-green-600",
+    borderColor: "border-green-600",
+    icon: Wand,
+    imageCid: "QmTH7dZ6KMvKA4Bxd3Trkj5Gj993YVgFbYA7MFpLyHwbxP",
+    description: "Ambitious, cunning, and resourceful. Slytherins are determined to achieve their goals.",
+  },
+  ravenclaw: {
+    name: "Ravenclaw",
+    color: "bg-blue-600",
+    textColor: "text-blue-600",
+    borderColor: "border-blue-600",
+    icon: Book,
+    imageCid: "QmWZQJZdj8QA7uQmE2tZgvYNfZBdcgRUaB3aTzQ1mEBJFk",
+    description: "Intelligent, wise, and creative. Ravenclaws value knowledge and learning above all.",
+  },
+  hufflepuff: {
+    name: "Hufflepuff",
+    color: "bg-yellow-500",
+    textColor: "text-yellow-500",
+    borderColor: "border-yellow-500",
+    icon: Leaf,
+    imageCid: "QmXZxeB4zyaKCQukzcKbX1Kw42LDcAix2yQYcGJyQYmRNT",
+    description: "Loyal, patient, and hardworking. Hufflepuffs value fairness and inclusivity.",
+  },
+}
+
+// Sample metadata CIDs for each house
+const houseMetadataCids = {
+  gryffindor: "QmcK5jxYsVGvzWQvJ8uJJCN7QHsRs5kPzLQu7x4WUxsv3S",
+  slytherin: "QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn",
+  ravenclaw: "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
+  hufflepuff: "QmZTR5bcpQD7cFgTorqxZDYaew1Wqgfbd2ud9QqGPAkK2V",
+}
+
+export default function Profile() {
+  const [processingItem, setProcessingItem] = useState<string | null>(null)
+  const { address, isConnected } = useAccount()
+  const [nftBalance, setNftBalance] = useState<number>(0)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [userNft, setUserNft] = useState<any>(null)
+  const [onboardingStep, setOnboardingStep] = useState<number>(0)
+  const [question, setQuestion] = useState<string>("")
+  const [userAnswer, setUserAnswer] = useState<string>("")
+  const [houseResult, setHouseResult] = useState<{ house: string; description: string } | null>(null)
+  const [submittingAnswer, setSubmittingAnswer] = useState<boolean>(false)
+
+  // Display house images for debugging
+  const [showHouseImages, setShowHouseImages] = useState<boolean>(false)
+
+  // Check if user has an NFT
+  useEffect(() => {
+    const checkNftBalance = async () => {
+      if (!isConnected || !address) {
+        setLoading(false)
+        return
+      }
+
+      try {
+        setLoading(true)
+        const balance = await readContract(config, {
+          abi: PlayerAvatarAbi,
+          address: PlayerAvatarAddress,
+          functionName: "balanceOf",
+          args: [address],
+        })
+
+        setNftBalance(Number(balance))
+
+        // If user has an NFT, fetch it
+        if (Number(balance) > 0) {
+          const tokenId = await readContract(config, {
+            abi: PlayerAvatarAbi,
+            address: PlayerAvatarAddress,
+            functionName: "getAvatarIdForUser",
+            args: [address],
+          })
+          console.log("tokenId:", tokenId)
+
+          const tokenUri = await readContract(config, {
+            abi: PlayerAvatarAbi,
+            address: PlayerAvatarAddress,
+            functionName: "tokenURI",
+            args: [tokenId],
+          })
+          console.log("tokenUri:", tokenUri)
+
+          // Fetch metadata from IPFS
+          // If the URI is an IPFS URI, convert it to use the Pinata gateway
+          const metadataUrl = tokenUri.startsWith("ipfs://") ? tokenUri.replace("ipfs://", baseUrl) : tokenUri
+
+          const response = await fetch(metadataUrl)
+          const metadata = await response.json()
+
+          setUserNft({
+            id: tokenId,
+            uri: tokenUri,
+            metadata,
+          })
+        } else {
+          // Start onboarding process
+          startOnboarding()
+        }
+      } catch (error) {
+        console.error("Error checking NFT balance:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    checkNftBalance()
+  }, [address, isConnected])
+
+  // Start onboarding process
+  const startOnboarding = async () => {
+    setOnboardingStep(1)
+    try {
+      // Fetch initial question from Gemini
+      const response = await fetch("/api/gemini/start-chat", {
+        method: "POST",
+      })
+
+      const data = await response.json()
+      setQuestion(data.question)
+    } catch (error) {
+      console.error("Error starting onboarding:", error)
+      setQuestion(
+        "If you could possess any magical artifact from the Harry Potter universe (besides a wand), which would you choose and why?",
+      )
+    }
   }
 
-  return (
-    <div className="min-h-screen bg-[#0a0a1a] text-gray-100 pt-16">
-      {/* Profile Banner */}
-      <div className="relative h-48 md:h-64 w-full overflow-hidden">
-        <Image src={user.banner || "/placeholder.svg"} alt="Profile Banner" fill className="object-cover opacity-50" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a1a] to-transparent"></div>
+  // Submit user's answer to Gemini
+  const submitAnswer = async () => {
+    if (!userAnswer.trim()) return
+
+    setSubmittingAnswer(true)
+    try {
+      const response = await fetch("/api/gemini/submit-answer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ answer: userAnswer }),
+      })
+
+      const data = await response.json()
+      setHouseResult(data)
+      setOnboardingStep(2)
+    } catch (error) {
+      console.error("Error submitting answer:", error)
+      // Fallback in case API fails
+      setHouseResult({
+        house: "Gryffindor",
+        description: "You show courage and determination in your choices. A true Gryffindor at heart!",
+      })
+      setOnboardingStep(2)
+    } finally {
+      setSubmittingAnswer(false)
+    }
+  }
+
+  // Create NFT metadata JSON
+  const createNftMetadata = (house: string, description: string) => {
+    const houseKey = house.toLowerCase() as keyof typeof houseData
+    const houseInfo = houseData[houseKey]
+
+    // Create the metadata object
+    return {
+      name: `${house} Wizard`,
+      description: description,
+      image: "https://scarlet-urgent-pig-985.mypinata.cloud/ipfs/bafkreihzbsiqff5i25fnkioe3j7nb7a5w75nodbfujrcucz6r77crekq5u",
+      attributes: [
+        {
+          trait_type: "House",
+          value: house,
+        },
+        {
+          trait_type: "Personality",
+          value: houseInfo.description.split(".")[0],
+        },
+      ],
+    }
+  }
+
+//   API Key: 3c9b25b0ab12d3919eb2
+// API Secret: 20293988e0bfb30d554bc455a02d20a41035b4b8dfeebe4f119e4c0241ecaa55
+// JWT: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1MjBmNGYxZi0zMDZiLTRhZjktYThhOC05ZTgxM2E3MzA0NTYiLCJlbWFpbCI6InN0dWR5MW5nYWNjMHVudDAwN0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiM2M5YjI1YjBhYjEyZDM5MTllYjIiLCJzY29wZWRLZXlTZWNyZXQiOiIyMDI5Mzk4OGUwYmZiMzBkNTU0YmM0NTVhMDJkMjBhNDEwMzViNGI4ZGZlZWJlNGYxMTllNGMwMjQxZWNhYTU1IiwiZXhwIjoxNzc0ODUwNDE4fQ.CL6bj71z0yhjIKdOtmMQyRDzova6TYs7RLNsQVmMNxE
+  const uploadToPinata = async (metadata: object) => {
+    const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
+    const pinataApiKey = "3c9b25b0ab12d3919eb2";
+    const pinataSecretApiKey = "20293988e0bfb30d554bc455a02d20a41035b4b8dfeebe4f119e4c0241ecaa55";
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                pinata_api_key: pinataApiKey,
+                pinata_secret_api_key: pinataSecretApiKey
+            },
+            body: JSON.stringify(metadata)
+        });
+        const data = await response.json();
+        consoloe.log("Pinata response:", data);
+        return `https://scarlet-urgent-pig-985.mypinata.cloud/ipfs/${data.IpfsHash}`;
+    } catch (error) {
+        console.error("Error uploading to Pinata:", error);
+        return null;
+    }
+};
+
+
+  // Mint NFT based on house result
+  const mintHouseNft = async () => {
+    if (!houseResult) return
+
+    setProcessingItem("minting")
+    try {
+      const house = houseResult.house.toLowerCase() as keyof typeof houseData
+      const houseInfo = houseData[house]
+
+      // In a real implementation, you would:
+      // 1. Create the metadata JSON
+      const metadata = createNftMetadata(houseResult.house, houseResult.description)
+      const metadataUri = await uploadToPinata(metadata)  
+
+      console.log("NFT Metadata:", metadata)
+
+      // 4. Mint the NFT with the metadata URI
+      const result = await writeContract(config, {
+        abi: PlayerAvatarAbi,
+        address: PlayerAvatarAddress,
+        functionName: "mintAvatar",
+        args: [metadataUri],
+      })
+
+      await waitForTransactionReceipt(config, { hash: result })
+      alert(`Successfully minted your ${houseResult.house} avatar!`)
+
+      // Refresh page to show the new NFT
+      window.location.reload()
+    } catch (error) {
+      console.error("Error minting avatar:", error)
+      alert("Failed to mint avatar. See console for details.")
+    } finally {
+      setProcessingItem(null)
+    }
+  }
+
+  // Toggle house images display
+  const toggleHouseImages = () => {
+    setShowHouseImages(!showHouseImages)
+  }
+
+  if (!isConnected) {
+    return (
+      <div className="container mx-auto py-12 text-center">
+        <h1 className="text-3xl font-bold mb-6">Wizard Profile</h1>
+        <Card className="max-w-md mx-auto">
+          <CardContent className="pt-6">
+            <p className="text-lg mb-4">Please connect your wallet to view your wizard profile</p>
+            <Wand className="w-16 h-16 mx-auto text-muted-foreground" />
+          </CardContent>
+        </Card>
       </div>
+    )
+  }
 
-      {/* Profile Header */}
-      <div className="container mx-auto px-4 -mt-20 relative z-10">
-        <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
-          <div className="w-32 h-32 rounded-full border-4 border-purple-500/30 bg-gradient-to-br from-purple-900/50 to-indigo-900/50 overflow-hidden">
-            <Image
-              src={user.avatar || "/placeholder.svg"}
-              alt={user.name}
-              width={128}
-              height={128}
-              className="object-cover"
-            />
-          </div>
+  if (loading) {
+    return (
+      <div className="container mx-auto py-12 text-center">
+        <h1 className="text-3xl font-bold mb-6">Wizard Profile</h1>
+        <Card className="max-w-md mx-auto">
+          <CardContent className="pt-6 flex flex-col items-center">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+            <p className="text-lg">Loading your wizard profile...</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
-          <div className="text-center md:text-left flex-1">
-            <h1 className="font-serif text-3xl md:text-4xl">{user.name}</h1>
-            <p className="text-purple-400 mb-1">{user.title}</p>
-            <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-2">
-              <Badge variant="outline" className="bg-purple-900/20 border-purple-500/30 text-purple-300">
-                Level {user.level}
-              </Badge>
-              <Badge variant="outline" className="bg-blue-900/20 border-blue-500/30 text-blue-300">
-                <Trophy className="h-3 w-3 mr-1" />
-                {user.stats.wins} Wins
-              </Badge>
-              <Badge variant="outline" className="bg-indigo-900/20 border-indigo-500/30 text-indigo-300">
-                <Clock className="h-3 w-3 mr-1" />
-                Joined {user.joinDate}
-              </Badge>
-            </div>
-          </div>
+  // Onboarding process
+  if (nftBalance === 0) {
+    return (
+      <div className="container mx-auto py-12">
+        <h1 className="text-3xl font-bold mb-6 text-center">Wizard Onboarding</h1>
 
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="bg-transparent border-purple-500/30 hover:bg-purple-900/20 hover:border-purple-400"
-            >
-              <BookOpen className="h-4 w-4 mr-2" />
-              Spellbook
-            </Button>
-            <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-              <Swords className="h-4 w-4 mr-2" />
-              Duel
-            </Button>
-          </div>
+        {/* Debug button to show house images */}
+        <div className="flex justify-center mb-4">
+          <Button variant="outline" size="sm" onClick={toggleHouseImages}>
+            {showHouseImages ? "Hide House Images" : "Show House Images"}
+          </Button>
         </div>
 
-        {/* Experience Bar */}
-        <div className="mt-6 mb-8">
-          <div className="flex justify-between text-sm mb-1">
-            <span>Experience</span>
-            <span>
-              {user.experience} / {user.nextLevelExp}
-            </span>
+        {/* House images display for debugging */}
+        {showHouseImages && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-4xl mx-auto">
+            {Object.entries(houseData).map(([key, house]) => (
+              <Card key={key} className="overflow-hidden">
+                <div className="aspect-square relative">
+                  <img
+                    src={`${baseUrl}${house.imageCid}`}
+                    alt={house.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=200"
+                    }}
+                  />
+                </div>
+                <CardContent className="p-4">
+                  <h3 className={`font-bold ${house.textColor}`}>{house.name}</h3>
+                  <p className="text-xs mt-1 text-muted-foreground">CID: {house.imageCid}</p>
+                  <p className="text-xs mt-1">
+                    Metadata CID: {houseMetadataCids[key as keyof typeof houseMetadataCids]}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-          <Progress
-            value={(user.experience / user.nextLevelExp) * 100}
-            className="h-2 bg-gray-800"
-            indicatorClassName="bg-gradient-to-r from-purple-500 to-indigo-500"
-          />
-          <p className="text-xs text-gray-400 mt-1">
-            {user.nextLevelExp - user.experience} XP until Level {user.level + 1}
-          </p>
-        </div>
+        )}
 
-        {/* Main Content */}
-        <Tabs defaultValue="stats" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-gray-900/50 border border-gray-800">
-            <TabsTrigger value="stats" className="data-[state=active]:bg-gray-800">
-              Statistics
-            </TabsTrigger>
-            <TabsTrigger value="achievements" className="data-[state=active]:bg-gray-800">
-              Achievements
-            </TabsTrigger>
-            <TabsTrigger value="history" className="data-[state=active]:bg-gray-800">
-              Battle History
-            </TabsTrigger>
-            <TabsTrigger value="spells" className="data-[state=active]:bg-gray-800">
-              Favorite Spells
-            </TabsTrigger>
-          </TabsList>
+        {onboardingStep === 1 && (
+          <Card className="max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wand className="h-6 w-6 text-primary" />
+                Sorting Hat Ceremony
+              </CardTitle>
+              <CardDescription>Answer the question below to determine your Hogwarts house</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-muted p-4 rounded-md">
+                <p className="text-lg">{question}</p>
+              </div>
+              <Textarea
+                placeholder="Type your answer here..."
+                value={userAnswer}
+                onChange={(e) => setUserAnswer(e.target.value)}
+                className="min-h-[120px]"
+              />
+            </CardContent>
+            <CardFooter>
+              <Button className="w-full" onClick={submitAnswer} disabled={!userAnswer.trim() || submittingAnswer}>
+                {submittingAnswer ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Analyzing your answer...
+                  </>
+                ) : (
+                  "Submit Answer"
+                )}
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
 
-          {/* Stats Tab */}
-          <TabsContent value="stats" className="border border-gray-800 bg-gray-900/30 rounded-b-lg p-4 mt-0">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="bg-gray-900/50 border-gray-800">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
-                    <Trophy className="h-5 w-5 mr-2 text-yellow-400" />
-                    Win Rate
-                  </CardTitle>
-                  <CardDescription>Your dueling performance</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-center h-40 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-4xl font-bold text-yellow-400">{user.stats.winRate}%</div>
-                    </div>
-                    <svg className="w-full h-full" viewBox="0 0 100 100">
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="#1f2937" strokeWidth="10" />
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="none"
-                        stroke="#eab308"
-                        strokeWidth="10"
-                        strokeDasharray={2 * Math.PI * 40}
-                        strokeDashoffset={2 * Math.PI * 40 * (1 - user.stats.winRate / 100)}
-                        transform="rotate(-90 50 50)"
-                      />
-                    </svg>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 text-center mt-2">
-                    <div>
-                      <p className="text-sm text-gray-400">Wins</p>
-                      <p className="text-lg font-medium text-green-400">{user.stats.wins}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-400">Losses</p>
-                      <p className="text-lg font-medium text-red-400">{user.stats.losses}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-400">Draws</p>
-                      <p className="text-lg font-medium text-blue-400">{user.stats.draws}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gray-900/50 border-gray-800">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
-                    <Flame className="h-5 w-5 mr-2 text-orange-400" />
-                    Win Streak
-                  </CardTitle>
-                  <CardDescription>Your consecutive victories</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col items-center justify-center h-40">
-                    <div className="text-5xl font-bold text-orange-400 mb-2">{user.stats.currentWinStreak}</div>
-                    <p className="text-sm text-gray-400">Current Streak</p>
-                    <div className="w-full h-0.5 bg-gray-800 my-4"></div>
-                    <div className="flex items-center">
-                      <Trophy className="h-5 w-5 mr-2 text-yellow-400" />
-                      <span className="text-sm text-gray-400">Best Streak:</span>
-                      <span className="text-lg font-medium ml-2">{user.stats.longestWinStreak}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gray-900/50 border-gray-800">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
-                    <BarChart3 className="h-5 w-5 mr-2 text-blue-400" />
-                    Total Matches
-                  </CardTitle>
-                  <CardDescription>Your dueling experience</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col items-center justify-center h-40">
-                    <div className="text-5xl font-bold text-blue-400 mb-2">{user.stats.totalMatches}</div>
-                    <p className="text-sm text-gray-400">Duels Completed</p>
-                    <div className="w-full h-0.5 bg-gray-800 my-4"></div>
-                    <div className="flex items-center">
-                      <Clock className="h-5 w-5 mr-2 text-purple-400" />
-                      <span className="text-sm text-gray-400">Member for:</span>
-                      <span className="text-lg font-medium ml-2">289 days</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Achievements Tab */}
-          <TabsContent value="achievements" className="border border-gray-800 bg-gray-900/30 rounded-b-lg p-4 mt-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {user.achievements.map((achievement) => (
-                <div
-                  key={achievement.id}
-                  className={`border rounded-lg p-4 flex items-center gap-4 ${
-                    achievement.completed ? "border-yellow-500/30 bg-yellow-900/10" : "border-gray-700 bg-gray-900/50"
-                  }`}
-                >
+        {onboardingStep === 2 && houseResult && (
+          <Card className="max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wand className="h-6 w-6 text-primary" />
+                Your Hogwarts House
+              </CardTitle>
+              <CardDescription>The Sorting Hat has made its decision</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {houseResult.house && houseData[houseResult.house.toLowerCase() as keyof typeof houseData] && (
+                <div className="flex flex-col items-center">
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      achievement.completed ? "bg-yellow-900/30 text-yellow-400" : "bg-gray-800 text-gray-400"
-                    }`}
+                    className={`w-32 h-32 rounded-full flex items-center justify-center ${houseData[houseResult.house.toLowerCase() as keyof typeof houseData].color}`}
                   >
-                    <achievement.icon className="h-6 w-6" />
+                    {React.createElement(houseData[houseResult.house.toLowerCase() as keyof typeof houseData].icon, {
+                      className: "w-16 h-16 text-white",
+                    })}
                   </div>
+                  <h2
+                    className={`text-2xl font-bold mt-4 ${houseData[houseResult.house.toLowerCase() as keyof typeof houseData].textColor}`}
+                  >
+                    {houseResult.house}
+                  </h2>
 
-                  <div className="flex-1">
-                    <div className="flex items-center">
-                      <h3 className="font-medium">{achievement.name}</h3>
-                      {achievement.completed && (
-                        <Badge className="ml-2 bg-yellow-500/20 text-yellow-300 border-yellow-500/30">Completed</Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-400">{achievement.description}</p>
-
-                    {achievement.completed ? (
-                      <p className="text-xs text-yellow-400 mt-1">Achieved on {achievement.date}</p>
-                    ) : (
-                      <div className="mt-2">
-                        <div className="flex justify-between text-xs mb-1">
-                          <span className="text-gray-400">Progress</span>
-                          <span>{achievement.progress}%</span>
-                        </div>
-                        <Progress
-                          value={achievement.progress}
-                          className="h-1.5 bg-gray-800"
-                          indicatorClassName="bg-yellow-600"
-                        />
-                      </div>
-                    )}
+                  {/* Display the house image from IPFS */}
+                  <div className="mt-4 aspect-square w-48 h-48 overflow-hidden rounded-md border">
+                    <img
+                      src={`${baseUrl}${houseData[houseResult.house.toLowerCase() as keyof typeof houseData].imageCid}`}
+                      alt={houseResult.house}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=200"
+                      }}
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
-          </TabsContent>
+              )}
 
-          {/* Battle History Tab */}
-          <TabsContent value="history" className="border border-gray-800 bg-gray-900/30 rounded-b-lg p-4 mt-0">
-            <div className="space-y-4">
-              <h3 className="font-medium text-lg">Recent Matches</h3>
-
-              <div className="space-y-2">
-                {user.recentMatches.map((match) => (
-                  <div
-                    key={match.id}
-                    className={`border rounded-lg p-3 flex items-center ${
-                      match.result === "win" ? "border-green-500/30 bg-green-900/10" : "border-red-500/30 bg-red-900/10"
-                    }`}
-                  >
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
-                        match.result === "win" ? "bg-green-900/30 text-green-400" : "bg-red-900/30 text-red-400"
-                      }`}
-                    >
-                      {match.result === "win" ? <Trophy className="h-4 w-4" /> : <Shield className="h-4 w-4" />}
-                    </div>
-
-                    <div className="flex-1">
-                      <div className="flex justify-between">
-                        <div className="flex items-center">
-                          <span className="font-medium">vs. {match.opponent}</span>
-                          <Badge
-                            className={`ml-2 ${
-                              match.result === "win"
-                                ? "bg-green-500/20 text-green-300 border-green-500/30"
-                                : "bg-red-500/20 text-red-300 border-red-500/30"
-                            }`}
-                          >
-                            {match.result === "win" ? "Victory" : "Defeat"}
-                          </Badge>
-                        </div>
-                        <span className="text-sm text-gray-400">{match.date}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="bg-muted p-4 rounded-md">
+                <p className="text-lg">{houseResult.description}</p>
               </div>
 
-              <div className="flex justify-center mt-4">
-                <Button variant="outline" className="bg-transparent border-gray-700 hover:bg-gray-800">
-                  View All Matches
-                </Button>
+              {/* Display metadata preview */}
+              <div className="bg-muted p-4 rounded-md">
+                <h3 className="font-medium mb-2">NFT Metadata Preview:</h3>
+                <pre className="text-xs overflow-auto">
+                  {JSON.stringify(createNftMetadata(houseResult.house, houseResult.description), null, 2)}
+                </pre>
               </div>
-            </div>
-          </TabsContent>
-
-          {/* Favorite Spells Tab */}
-          <TabsContent value="spells" className="border border-gray-800 bg-gray-900/30 rounded-b-lg p-4 mt-0">
-            <div className="space-y-4">
-              <h3 className="font-medium text-lg">Most Used Spells</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {user.favoriteSpells.map((spell, index) => (
-                  <div
-                    key={index}
-                    className="border border-gray-700 bg-gray-900/50 rounded-lg p-4 flex items-center gap-4"
-                  >
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-indigo-900/30 text-indigo-400">
-                      {index === 0 && <Zap className="h-5 w-5" />}
-                      {index === 1 && <Shield className="h-5 w-5" />}
-                      {index === 2 && <Flame className="h-5 w-5" />}
-                      {index === 3 && <Sparkles className="h-5 w-5" />}
-                    </div>
-
-                    <div className="flex-1">
-                      <h4 className="font-medium">{spell.name}</h4>
-                      <div className="flex justify-between text-sm text-gray-400">
-                        <span>Used {spell.uses} times</span>
-                        <span>Win rate: {spell.winRate}%</span>
-                      </div>
-                      <Progress
-                        value={spell.winRate}
-                        className="h-1.5 bg-gray-800 mt-2"
-                        indicatorClassName="bg-indigo-600"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+            </CardContent>
+            <CardFooter>
+              <Button className="w-full" onClick={mintHouseNft} disabled={processingItem === "minting"}>
+                {processingItem === "minting" ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Minting your wizard avatar...
+                  </>
+                ) : (
+                  "Mint Your Wizard Avatar"
+                )}
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
       </div>
+    )
+  }
+
+  // Display existing NFT
+  return (
+    <div className="container mx-auto py-12">
+      <h1 className="text-3xl font-bold mb-6 text-center">Wizard Profile</h1>
+
+      {userNft && (
+        <Card className="max-w-2xl mx-auto">
+          <div className="aspect-square relative overflow-hidden">
+            {userNft.metadata?.image && (
+              <img
+                src={userNft.metadata.image.replace("ipfs://", baseUrl) || "/placeholder.svg"}
+                alt={userNft.metadata.name || "Wizard Avatar"}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=400&width=400"
+                }}
+              />
+            )}
+          </div>
+          <CardHeader>
+            <CardTitle>{userNft.metadata?.name || "Wizard Avatar"}</CardTitle>
+            <CardDescription>{userNft.metadata?.description || "Your magical avatar"}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {userNft.metadata?.attributes && (
+              <div className="flex flex-wrap gap-2">
+                {userNft.metadata.attributes.map((attr: any, index: number) => (
+                  <Badge key={index} variant="outline">
+                    {attr.trait_type}: {attr.value}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-4 p-4 bg-muted rounded-md">
+              <h3 className="font-medium mb-2">NFT Metadata:</h3>
+              <pre className="text-xs overflow-auto">{JSON.stringify(userNft.metadata, null, 2)}</pre>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
-
