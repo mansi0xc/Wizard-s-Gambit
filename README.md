@@ -100,3 +100,29 @@ all powered by smart contracts. Step into the arena, summon legendary entities, 
 
 **Join the magic, claim your wand, and duel to glory! ⚡🧙‍♂️**
 
+## Deployed Addresses:
+
+1. PlayerAvatar.sol
+```bash
+0xcE82a726987DEE8A728Ce3388922CC95fd21D95c
+```
+2. RuneToken.sol
+```bash
+0x1a401b9Bdf05Db21208130db3b29d5fB8fEfF605
+```
+3. GameItems.sol
+```bash
+0x5C4b233ACA1c1D2dbCc185A46E4C5Ce97d87fcb8
+```
+4. Marketplace.sol
+```bash
+0x200c390fDb8227C525dd3843C8FFB0F86CD835b9
+```
+5. BattleArena.sol
+```bash
+0x1a401b9Bdf05Db21208130db3b29d5fB8fEfF605
+```
+6. BettingSystem.sol
+```bash
+0x1a401b9Bdf05Db21208130db3b29d5fB8fEfF605
+```
