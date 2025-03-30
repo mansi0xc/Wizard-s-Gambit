@@ -2,9 +2,5 @@
   "version": 3,
   "sources": [],
   "sections": [
-<<<<<<< HEAD
-    {"offset": {"line": 12, "column": 0}, "map": {"version":3,"sources":["file:///home/samk/Desktop/binary/client/src/app/favicon.ico.mjs%20%28structured%20image%20object%29"],"sourcesContent":["import src from \"IMAGE\";\nexport default { src, width: 256, height: 256 }\n"],"names":[],"mappings":";;;AAAA;;uCACe;IAAE,KAAA,8GAAA,CAAA,UAAG;IAAE,OAAO;IAAK,QAAQ;AAAI","debugId":null}}]
-=======
-    {"offset": {"line": 12, "column": 0}, "map": {"version":3,"sources":["file:///Users/user/wizardshit/Wizard-s-Gambit/client/src/app/favicon.ico.mjs%20%28structured%20image%20object%29"],"sourcesContent":["import src from \"IMAGE\";\nexport default { src, width: 256, height: 256 }\n"],"names":[],"mappings":";;;AAAA;;uCACe;IAAE,KAAA,8GAAA,CAAA,UAAG;IAAE,OAAO;IAAK,QAAQ;AAAI","debugId":null}}]
->>>>>>> eec972006fadf23a9e4a4c6ae7b71804ed65d18c
+    {"offset": {"line": 12, "column": 0}, "map": {"version":3,"sources":["file://C%3A/Users/santu/OneDrive/Desktop/Wizard-s-Gambit/client/src/app/favicon.ico.mjs%20%28structured%20image%20object%29"],"sourcesContent":["import src from \"IMAGE\";\nexport default { src, width: 256, height: 256 }\n"],"names":[],"mappings":";;;AAAA;;uCACe;IAAE,KAAA,8GAAA,CAAA,UAAG;IAAE,OAAO;IAAK,QAAQ;AAAI","debugId":null}}]
 }

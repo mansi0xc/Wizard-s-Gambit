@@ -1,6 +1,6 @@
 "use client";
 import { useAccount, useReadContract, useWriteContract } from 'wagmi';
-import { abi, contract_address } from '@/app/abis/bloodCamp';
+import { abi, contract_address } from '@/abi/player';
 import { useState } from 'react';
 import Image from "next/image";
 import { Loader2, WandSparkles } from "lucide-react";

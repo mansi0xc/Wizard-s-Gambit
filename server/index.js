@@ -54,6 +54,7 @@ io.on("connection", (socket) => {
 
   // Handle game actions
   socket.on("cast_spell", (data) => {
+    
     const room = rooms.get(data.roomId)
     if (!room) return
 
@@ -89,6 +90,11 @@ io.on("connection", (socket) => {
     io.to(room.id).emit("round_start", { round: room.round })
   })
 
+  socket.on("player_details",(roomId) => {
+    socket.emit("player_details_response", getPlayerDetails(roomId));
+    console.log("players detail:", getPlayerDetails(roomId))
+  
+  })
   // Handle leaving room
   socket.on("leave_room", (data) => {
     const room = rooms.get(data.roomId)
@@ -208,9 +214,10 @@ function joinRoom(socket, roomId) {
 
 
 
-function sendPlayerDetails(roomId) {
+function getPlayerDetails(roomId) {
   const room = rooms.get(roomId)
   if (!room) return   
+  const [player1, player2] = room.players
   const playerDetails = room.players.map((player) => ({
     socketId: player.socketId,
     type: player.type,
@@ -220,9 +227,7 @@ function sendPlayerDetails(roomId) {
   }))
   return playerDetails
 }
-socket.on("player_details",(roomId) => {
-  sendPlayerDetails(roomId);
-})
+
 
 
 
@@ -232,8 +237,8 @@ socket.on("player_details",(roomId) => {
 
 function processRound(room) {
   const [player1, player2] = room.players
-
   const result = calculateRoundResult(player1.currentAction, player2.currentAction)
+  console.log(player1, player2)
 
   // Update player states
   if (!result.isVoid) {
@@ -280,6 +285,7 @@ function processRound(room) {
         p.currentAction = null
       })
       io.to(room.id).emit("round_start", { round: room.round })
+     
     }
   } else {
     // Clear actions for next turn
