@@ -4,8 +4,9 @@ pragma solidity ^0.8.22;
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {ERC1155Burnable} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
+import {ERC1155URIStorage} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
 
-contract GameItems is ERC1155, AccessControl, ERC1155Burnable {
+contract UpdatedGame is ERC1155, ERC1155URIStorage, AccessControl, ERC1155Burnable {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     // Element Cards (Fungible)
@@ -39,119 +40,98 @@ contract GameItems is ERC1155, AccessControl, ERC1155Burnable {
     uint256 public constant DUMBLEDORE = 9200;
     uint256 public constant VOLDEMORT = 9300;
 
-    constructor(address admin) ERC1155("https://gameitems/{id}.json") {
+    constructor(address admin) ERC1155("") {
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(MINTER_ROLE, admin);
     }
 
-    function isValidBasicSpell(uint256 spellId) internal pure returns (bool) {
-        return spellId == 401 || spellId == 501 || spellId == 601; // Only Level 1 Spells
+    function mint(address account, uint256 id, uint256 amount, string memory uri) public onlyRole(MINTER_ROLE) {
+        _mint(account, id, amount, "");
+        _setURI(id, uri);
     }
 
+    function uri(uint256 tokenId) public view override(ERC1155, ERC1155URIStorage) returns (string memory) {
+        return super.uri(tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC1155, AccessControl) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
 
     function mintBasicSpell(uint256 spellId, uint256 elementCard, uint256 amount, string memory uri) external {
         require(isValidBasicSpell(spellId), "Invalid spell ID");
-
-        _burn(msg.sender, elementCard, amount); // Burn the  element cards
-        bytes memory uriBytes = bytes(uri);
-        _mint(msg.sender, spellId, 1, uriBytes); // Mint the Level 1 spell
-        // _mint(msg.sender, spellId, 1, uri); // Mint the Level 1 spell
+        _burn(msg.sender, elementCard, amount);
+        mint(msg.sender, spellId, 1, "");
+        _setURI(spellId, uri);
     }
-
 
     // Upgrade Spell (Requires Burning Cards & Having Wand)
     function upgradeSpell(uint256 oldSpell, uint256 newSpell, uint256 elementCard, uint256 wandId, string memory uri) external {
         require(isValidUpgrade(oldSpell, newSpell), "Invalid spell upgrade path");
         require(balanceOf(msg.sender, elementCard) >= 100, "Not enough element cards");
         require(balanceOf(msg.sender, wandId) > 0, "Required wand level not owned");
-
         _burn(msg.sender, elementCard, 100);
         _burn(msg.sender, oldSpell, 1);
-        bytes memory uriBytes = bytes(uri);
-        _mint(msg.sender, newSpell, 1, uriBytes);
+        mint(msg.sender, newSpell, 1, "");
+        _setURI(newSpell, uri);
     }
 
     // Mint Professor SFT (Burns Shards)
     function mintProfessor(uint256 shardId, uint256 professorId) external {
         uint256 userBalance = balanceOf(msg.sender, shardId);
         require(userBalance >= 4, "Need at least 4 shards to mint professor");
-
-        // Burn all Snape Shards
         _burn(msg.sender, shardId, userBalance);
-
-        // Mint 1 Snape Professor
-        _mint(msg.sender, professorId, 1, "");
+        mint(msg.sender, professorId, 1, "");
     }
 
     // Mint Professor Shards SFT
     function mintProfessorShard(uint256 shardId, uint256 amount, uint256 professorID, string memory uri) external {
         require(isValidProfessor(shardId, professorID), "Invalid shard for this professor");
         require(amount > 0, "Amount must be greater than zero");
-        bytes memory uriBytes = bytes(uri);
-        _mint(msg.sender, shardId, amount, uriBytes);
+        mint(msg.sender, shardId, amount, "");
+        _setURI(shardId, uri);
     }
 
-    // Mint Element Cards
+    // Mint Element Cards (SFT)
     function mintElementCard(uint256 cardId, uint256 amount, string memory uri) external {
-        require(cardId == INFERNO_CARD || cardId == FROST_CARD || cardId == TEMPEST_CARD, "Invalid element card ID");
+        require(cardId == 1001 || cardId == 1002 || cardId == 1003, "Invalid element card ID");
         require(amount > 0, "Amount must be greater than zero");
-        bytes memory uriBytes = bytes(uri);
-        _mint(msg.sender, cardId, amount, uriBytes);
+        mint(msg.sender, cardId, amount, "");
+        _setURI(cardId, uri);
     }
 
-    // Mint Wands
+    // Mint Wands (SFT)
     function mintWand(uint256 wandId, uint256 amount, string memory uri) external {
-        require(
-            (wandId >= 101 && wandId <= 103) || (wandId >= 201 && wandId <= 203) || (wandId >= 301 && wandId <= 303),
-            "Invalid wand ID"
-        );
+        require((wandId >= 101 && wandId <= 103) || (wandId >= 201 && wandId <= 203) || (wandId >= 301 && wandId <= 303), "Invalid wand ID");
         require(amount > 0, "Amount must be greater than zero");
-        bytes memory uriBytes = bytes(uri);
-        _mint(msg.sender, wandId, amount, uriBytes);
+        mint(msg.sender, wandId, amount, "");
+        _setURI(wandId, uri);
     }
 
-    // Mint Patronus
+    // Mint Patronus (SFT)
     function mintPatronus(uint256 patronusId, string memory uri) external {
-        require(
-            patronusId == stag || patronusId == phoenix || patronusId == otter || patronusId == wolf,
-            "Invalid Patronus ID"
-        );
-        bytes memory uriBytes = bytes(uri);
-        _mint(msg.sender, patronusId, 1, uriBytes);
+        require(patronusId >= 701 && patronusId <= 704, "Invalid Patronus ID");
+        mint(msg.sender, patronusId, 1, "");
+        _setURI(patronusId, uri);
     }
 
     function transfer(address from, address to, uint256 id, uint256 value) external {
         safeTransferFrom(from, to, id, value, "");
     }
 
-    // Validate Spell Upgrade Path
+    function isValidBasicSpell(uint256 spellId) internal pure returns (bool) {
+        return spellId == 401 || spellId == 501 || spellId == 601;
+    }
+
     function isValidUpgrade(uint256 oldSpell, uint256 newSpell) internal pure returns (bool) {
-        return 
-            (oldSpell == 401 && newSpell == 402) || (oldSpell == 402 && newSpell == 403) || // Inferno
-            (oldSpell == 501 && newSpell == 502) || (oldSpell == 502 && newSpell == 503) || // Glacius
-            (oldSpell == 601 && newSpell == 602) || (oldSpell == 602 && newSpell == 603);   // Tempest
+        return (oldSpell == 401 && newSpell == 402) || (oldSpell == 402 && newSpell == 403) || 
+               (oldSpell == 501 && newSpell == 502) || (oldSpell == 502 && newSpell == 503) || 
+               (oldSpell == 601 && newSpell == 602) || (oldSpell == 602 && newSpell == 603);
     }
 
-    // Validate Professor Minting Path
     function isValidProfessor(uint256 shard, uint256 professor) internal pure returns (bool) {
-        return 
-            (shard == SNAPE_SHARD && professor == SNAPE) || 
-            (shard == DUMBLEDORE_SHARD && professor == DUMBLEDORE) || 
-            (shard == VOLDEMORT_SHARD && professor == VOLDEMORT);
-    }
-
-    // Mint Function for Admin
-    function mint(address account, uint256 id, uint256 amount) public onlyRole(MINTER_ROLE) {
-        _mint(account, id, amount, "");
-    }
-
-    // Set Metadata URI
-    function setURI(string memory newuri) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        _setURI(newuri);
-    }
-
-    // ERC165 Support
-    function supportsInterface(bytes4 interfaceId) public view override(ERC1155, AccessControl) returns (bool) {
-        return super.supportsInterface(interfaceId);
+        return (shard == 9001 && professor == 9100) || 
+               (shard == 9002 && professor == 9200) || 
+               (shard == 9003 && professor == 9300);
     }
 }
