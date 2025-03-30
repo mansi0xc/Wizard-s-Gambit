@@ -52,6 +52,9 @@ io.on("connection", (socket) => {
     }
   })
 
+  socket.on("player_details",(roomId) => {
+    sendPlayerDetails(roomId);
+  })
   // Handle game actions
   socket.on("cast_spell", (data) => {
     const room = rooms.get(data.roomId)
@@ -220,9 +223,6 @@ function sendPlayerDetails(roomId) {
   }))
   return playerDetails
 }
-socket.on("player_details",(roomId) => {
-  sendPlayerDetails(roomId);
-})
 
 
 
