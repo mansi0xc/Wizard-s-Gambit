@@ -1,19 +1,714 @@
+// export const PlayerAvatarAbi = [
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "initialOwner",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "address",
+// 				"name": "_Rune",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"stateMutability": "nonpayable",
+// 		"type": "constructor"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "sender",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			},
+// 			{
+// 				"internalType": "address",
+// 				"name": "owner",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "ERC721IncorrectOwner",
+// 		"type": "error"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "operator",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"name": "ERC721InsufficientApproval",
+// 		"type": "error"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "approver",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "ERC721InvalidApprover",
+// 		"type": "error"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "operator",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "ERC721InvalidOperator",
+// 		"type": "error"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "owner",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "ERC721InvalidOwner",
+// 		"type": "error"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "receiver",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "ERC721InvalidReceiver",
+// 		"type": "error"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "sender",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "ERC721InvalidSender",
+// 		"type": "error"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"name": "ERC721NonexistentToken",
+// 		"type": "error"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "owner",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "OwnableInvalidOwner",
+// 		"type": "error"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "account",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "OwnableUnauthorizedAccount",
+// 		"type": "error"
+// 	},
+// 	{
+// 		"anonymous": false,
+// 		"inputs": [
+// 			{
+// 				"indexed": true,
+// 				"internalType": "address",
+// 				"name": "owner",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"indexed": true,
+// 				"internalType": "address",
+// 				"name": "approved",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"indexed": true,
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"name": "Approval",
+// 		"type": "event"
+// 	},
+// 	{
+// 		"anonymous": false,
+// 		"inputs": [
+// 			{
+// 				"indexed": true,
+// 				"internalType": "address",
+// 				"name": "owner",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"indexed": true,
+// 				"internalType": "address",
+// 				"name": "operator",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"indexed": false,
+// 				"internalType": "bool",
+// 				"name": "approved",
+// 				"type": "bool"
+// 			}
+// 		],
+// 		"name": "ApprovalForAll",
+// 		"type": "event"
+// 	},
+// 	{
+// 		"anonymous": false,
+// 		"inputs": [
+// 			{
+// 				"indexed": true,
+// 				"internalType": "address",
+// 				"name": "user",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"indexed": false,
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			},
+// 			{
+// 				"indexed": false,
+// 				"internalType": "string",
+// 				"name": "uri",
+// 				"type": "string"
+// 			}
+// 		],
+// 		"name": "AvatarMinted",
+// 		"type": "event"
+// 	},
+// 	{
+// 		"anonymous": false,
+// 		"inputs": [
+// 			{
+// 				"indexed": true,
+// 				"internalType": "address",
+// 				"name": "user",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"indexed": false,
+// 				"internalType": "string",
+// 				"name": "newUri",
+// 				"type": "string"
+// 			}
+// 		],
+// 		"name": "AvatarUpdated",
+// 		"type": "event"
+// 	},
+// 	{
+// 		"anonymous": false,
+// 		"inputs": [
+// 			{
+// 				"indexed": false,
+// 				"internalType": "uint256",
+// 				"name": "_fromTokenId",
+// 				"type": "uint256"
+// 			},
+// 			{
+// 				"indexed": false,
+// 				"internalType": "uint256",
+// 				"name": "_toTokenId",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"name": "BatchMetadataUpdate",
+// 		"type": "event"
+// 	},
+// 	{
+// 		"anonymous": false,
+// 		"inputs": [
+// 			{
+// 				"indexed": false,
+// 				"internalType": "uint256",
+// 				"name": "_tokenId",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"name": "MetadataUpdate",
+// 		"type": "event"
+// 	},
+// 	{
+// 		"anonymous": false,
+// 		"inputs": [
+// 			{
+// 				"indexed": true,
+// 				"internalType": "address",
+// 				"name": "previousOwner",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"indexed": true,
+// 				"internalType": "address",
+// 				"name": "newOwner",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "OwnershipTransferred",
+// 		"type": "event"
+// 	},
+// 	{
+// 		"anonymous": false,
+// 		"inputs": [
+// 			{
+// 				"indexed": true,
+// 				"internalType": "address",
+// 				"name": "from",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"indexed": true,
+// 				"internalType": "address",
+// 				"name": "to",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"indexed": true,
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"name": "Transfer",
+// 		"type": "event"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "to",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"name": "approve",
+// 		"outputs": [],
+// 		"stateMutability": "nonpayable",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "owner",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "balanceOf",
+// 		"outputs": [
+// 			{
+// 				"internalType": "uint256",
+// 				"name": "",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"stateMutability": "view",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"name": "getApproved",
+// 		"outputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"stateMutability": "view",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "user",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "getAvatar",
+// 		"outputs": [
+// 			{
+// 				"internalType": "uint256",
+// 				"name": "",
+// 				"type": "uint256"
+// 			},
+// 			{
+// 				"internalType": "string",
+// 				"name": "",
+// 				"type": "string"
+// 			}
+// 		],
+// 		"stateMutability": "view",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "owner",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "address",
+// 				"name": "operator",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "isApprovedForAll",
+// 		"outputs": [
+// 			{
+// 				"internalType": "bool",
+// 				"name": "",
+// 				"type": "bool"
+// 			}
+// 		],
+// 		"stateMutability": "view",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "string",
+// 				"name": "uri",
+// 				"type": "string"
+// 			}
+// 		],
+// 		"name": "mintAvatar",
+// 		"outputs": [],
+// 		"stateMutability": "nonpayable",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [],
+// 		"name": "name",
+// 		"outputs": [
+// 			{
+// 				"internalType": "string",
+// 				"name": "",
+// 				"type": "string"
+// 			}
+// 		],
+// 		"stateMutability": "view",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [],
+// 		"name": "owner",
+// 		"outputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"stateMutability": "view",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "to",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "string",
+// 				"name": "uri",
+// 				"type": "string"
+// 			}
+// 		],
+// 		"name": "ownerMint",
+// 		"outputs": [],
+// 		"stateMutability": "nonpayable",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"name": "ownerOf",
+// 		"outputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"stateMutability": "view",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [],
+// 		"name": "renounceOwnership",
+// 		"outputs": [],
+// 		"stateMutability": "nonpayable",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [],
+// 		"name": "rune",
+// 		"outputs": [
+// 			{
+// 				"internalType": "contract Rune",
+// 				"name": "",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"stateMutability": "view",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "from",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "address",
+// 				"name": "to",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"name": "safeTransferFrom",
+// 		"outputs": [],
+// 		"stateMutability": "nonpayable",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "from",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "address",
+// 				"name": "to",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			},
+// 			{
+// 				"internalType": "bytes",
+// 				"name": "data",
+// 				"type": "bytes"
+// 			}
+// 		],
+// 		"name": "safeTransferFrom",
+// 		"outputs": [],
+// 		"stateMutability": "nonpayable",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "operator",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "bool",
+// 				"name": "approved",
+// 				"type": "bool"
+// 			}
+// 		],
+// 		"name": "setApprovalForAll",
+// 		"outputs": [],
+// 		"stateMutability": "nonpayable",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "bytes4",
+// 				"name": "interfaceId",
+// 				"type": "bytes4"
+// 			}
+// 		],
+// 		"name": "supportsInterface",
+// 		"outputs": [
+// 			{
+// 				"internalType": "bool",
+// 				"name": "",
+// 				"type": "bool"
+// 			}
+// 		],
+// 		"stateMutability": "view",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [],
+// 		"name": "symbol",
+// 		"outputs": [
+// 			{
+// 				"internalType": "string",
+// 				"name": "",
+// 				"type": "string"
+// 			}
+// 		],
+// 		"stateMutability": "view",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"name": "tokenURI",
+// 		"outputs": [
+// 			{
+// 				"internalType": "string",
+// 				"name": "",
+// 				"type": "string"
+// 			}
+// 		],
+// 		"stateMutability": "view",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "from",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "address",
+// 				"name": "to",
+// 				"type": "address"
+// 			},
+// 			{
+// 				"internalType": "uint256",
+// 				"name": "tokenId",
+// 				"type": "uint256"
+// 			}
+// 		],
+// 		"name": "transferFrom",
+// 		"outputs": [],
+// 		"stateMutability": "nonpayable",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "address",
+// 				"name": "newOwner",
+// 				"type": "address"
+// 			}
+// 		],
+// 		"name": "transferOwnership",
+// 		"outputs": [],
+// 		"stateMutability": "nonpayable",
+// 		"type": "function"
+// 	},
+// 	{
+// 		"inputs": [
+// 			{
+// 				"internalType": "string",
+// 				"name": "newUri",
+// 				"type": "string"
+// 			}
+// 		],
+// 		"name": "updateAvatar",
+// 		"outputs": [],
+// 		"stateMutability": "nonpayable",
+// 		"type": "function"
+// 	}
+// ]
+// export const PlayerAvatarAddress = "0xe19e82885789aDFD368693633603a864E369FD8f"
 export const PlayerAvatarAbi = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "AlreadyMinted",
+		"type": "error"
+	},
 	{
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "initialOwner",
+				"name": "to",
 				"type": "address"
 			},
 			{
-				"internalType": "address",
-				"name": "_Rune",
-				"type": "address"
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
 			}
 		],
+		"name": "approve",
+		"outputs": [],
 		"stateMutability": "nonpayable",
-		"type": "constructor"
+		"type": "function"
 	},
 	{
 		"inputs": [
@@ -121,6 +816,24 @@ export const PlayerAvatarAbi = [
 	{
 		"inputs": [
 			{
+				"internalType": "string",
+				"name": "tokenURI",
+				"type": "string"
+			}
+		],
+		"name": "mintAvatar",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "NotTokenOwner",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "owner",
 				"type": "address"
@@ -138,6 +851,16 @@ export const PlayerAvatarAbi = [
 			}
 		],
 		"name": "OwnableUnauthorizedAccount",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "TokenNotFound",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "URIEmpty",
 		"type": "error"
 	},
 	{
@@ -208,7 +931,7 @@ export const PlayerAvatarAbi = [
 			{
 				"indexed": false,
 				"internalType": "string",
-				"name": "uri",
+				"name": "tokenURI",
 				"type": "string"
 			}
 		],
@@ -226,8 +949,14 @@ export const PlayerAvatarAbi = [
 			},
 			{
 				"indexed": false,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
 				"internalType": "string",
-				"name": "newUri",
+				"name": "newTokenURI",
 				"type": "string"
 			}
 		],
@@ -286,228 +1015,10 @@ export const PlayerAvatarAbi = [
 		"type": "event"
 	},
 	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "Transfer",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "approve",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			}
-		],
-		"name": "balanceOf",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "getApproved",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "getAvatar",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "operator",
-				"type": "address"
-			}
-		],
-		"name": "isApprovedForAll",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "uri",
-				"type": "string"
-			}
-		],
-		"name": "mintAvatar",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "name",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "uri",
-				"type": "string"
-			}
-		],
-		"name": "ownerMint",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "ownerOf",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "renounceOwnership",
 		"outputs": [],
 		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "rune",
-		"outputs": [
-			{
-				"internalType": "contract Rune",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -580,6 +1091,286 @@ export const PlayerAvatarAbi = [
 		"type": "function"
 	},
 	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "Transfer",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "newTokenURI",
+				"type": "string"
+			}
+		],
+		"name": "updateAvatar",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			}
+		],
+		"name": "balanceOf",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "getApproved",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getAvatarIdForUser",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getAvatarInfo",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "exists",
+				"type": "bool"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "uri",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "hasAvatar",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "hasMinted",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "operator",
+				"type": "address"
+			}
+		],
+		"name": "isApprovedForAll",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "name",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "nextTokenId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "ownerOf",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "bytes4",
@@ -634,50 +1425,20 @@ export const PlayerAvatarAbi = [
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "from",
+				"name": "",
 				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
+			}
+		],
+		"name": "userToTokenId",
+		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "tokenId",
+				"name": "",
 				"type": "uint256"
 			}
 		],
-		"name": "transferFrom",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "newUri",
-				"type": "string"
-			}
-		],
-		"name": "updateAvatar",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	}
 ]
-export const PlayerAvatarAddress = "0x2c2f170e43B5705c608e81cF8506478BfEC7c025"
+export const PlayerAvatarAddress = "0xcE82a726987DEE8A728Ce3388922CC95fd21D95c"

@@ -4,7 +4,5 @@
   "/collection/page": "app/collection/page.js",
   "/deck/page": "app/deck/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/items/page": "app/items/page.js",
-  "/page": "app/page.js",
-  "/spellbook/page": "app/spellbook/page.js"
+  "/page": "app/page.js"
 }

@@ -1,4 +1,4 @@
-export const GameItemsAddress = "0x248673bA635bBA8459bBe706c22cB0cc06dC159a";
+export const GameItemsAddress = "0x5C4b233ACA1c1D2dbCc185A46E4C5Ce97d87fcb8";
 
 export const GameItemsABI = [
 	{
@@ -240,11 +240,6 @@ export const GameItemsABI = [
 				"internalType": "uint256",
 				"name": "amount",
 				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "uri",
-				"type": "string"
 			}
 		],
 		"name": "mint",
@@ -581,6 +576,19 @@ export const GameItemsABI = [
 			}
 		],
 		"name": "setApprovalForAll",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "newuri",
+				"type": "string"
+			}
+		],
+		"name": "setURI",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -1147,7 +1155,7 @@ export const GameItemsABI = [
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "tokenId",
+				"name": "",
 				"type": "uint256"
 			}
 		],
