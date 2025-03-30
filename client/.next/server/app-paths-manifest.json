@@ -1,7 +1,32 @@
 {
+<<<<<<< HEAD
+<<<<<<< HEAD
+  "/_not-found/page": "app/_not-found/page.js",
+  "/badges/page": "app/badges/page.js",
+  "/battle/page": "app/battle/page.js",
+  "/collection/page": "app/collection/page.js",
+  "/deck/page": "app/deck/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/page": "app/page.js",
+  "/patronus/page": "app/patronus/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/quiz/page": "app/quiz/page.js",
+  "/spectate/page": "app/spectate/page.js"
+=======
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/page": "app/page.js",
+  "/profile/page": "app/profile/page.js"
+>>>>>>> eec972006fadf23a9e4a4c6ae7b71804ed65d18c
+=======
   "/_not-found/page": "app/_not-found/page.js",
   "/api/gemini/start-chat/route": "app/api/gemini/start-chat/route.js",
   "/api/gemini/submit-answer/route": "app/api/gemini/submit-answer/route.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
+<<<<<<< HEAD
   "/profile/page": "app/profile/page.js"
+=======
+  "/items/page": "app/items/page.js",
+  "/page": "app/page.js"
+>>>>>>> 8acf52e585866a6604bb7217a75c24d59d5ae707
+>>>>>>> 6168fc0ec087d0389a077739a238210c956a22ed
 }
