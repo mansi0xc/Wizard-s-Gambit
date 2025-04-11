@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react"
 import { useAccount } from "wagmi"
 import { writeContract, waitForTransactionReceipt, readContract } from "@wagmi/core"
-import { BetAddress, betAbi } from "../abi/Bets"
-import { RuneAbi, RuneAdress } from "../abi/RuneAbi"
+import { betsAddress, betsAbi } from "../abi/final/Betss"
+import { RuneAbi, RuneAddress } from "../abi/final/RuneAbi"
 import { config } from "../wagmi"
 import { Loader2, FlameIcon as Fire, Sparkles, User, RefreshCw } from "lucide-react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -34,7 +34,7 @@ export default function BetPage() {
     try {
       const balance = await readContract(config, {
         abi: RuneAbi,
-        address: RuneAdress,
+        address: RuneAddress,
         functionName: "balanceOf",
         args: [address],
       })
@@ -60,8 +60,8 @@ export default function BetPage() {
     setProcessingItem("register")
     try {
       const result = await writeContract(config, {
-        abi: betAbi,
-        address: BetAddress,
+        abi: betsAbi,
+        address: betsAddress,
         functionName: "registerBattle",
         args: [battleId, playerA as Address, playerB as Address],
       })
@@ -88,9 +88,9 @@ export default function BetPage() {
 
       const result = await writeContract(config, {
         abi: RuneAbi,
-        address: RuneAdress,
+        address: RuneAddress,
         functionName: "approve",
-        args: [BetAddress as Address, amountInWei],
+        args: [betsAddress as Address, amountInWei],
       })
       await waitForTransactionReceipt(config, { hash: result })
       alert(`Successfully approved ${betAmount} Rune tokens`)
@@ -114,8 +114,8 @@ export default function BetPage() {
       const amountInWei = BigInt(Number.parseFloat(betAmount) * 1e18)
 
       const result = await writeContract(config, {
-        abi: betAbi,
-        address: BetAddress,
+        abi: betsAbi,
+        address: betsAddress,
         functionName: "placeBet",
         args: [battleId, playerA as Address, amountInWei],
       })
@@ -141,8 +141,8 @@ export default function BetPage() {
     setProcessingItem("settle")
     try {
       const result = await writeContract(config, {
-        abi: betAbi,
-        address: BetAddress,
+        abi: betsAbi,
+        address: betsAddress,
         functionName: "settleBets",
         args: [battleId, winner as Address],
       })
@@ -163,7 +163,7 @@ export default function BetPage() {
   const formattedBalance = (runeBalance / BigInt(10 ** 18)).toString()
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 mt-70">
       <Card className="w-full max-w-3xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">

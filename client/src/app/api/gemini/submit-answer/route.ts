@@ -43,7 +43,7 @@ Follow this structured process:
 
 2. **Step 2: Process the Answer**  
    - Once the user responds, analyze their personality based on their answer.  
-   - Assign them to one of the four houses: **Gryffindor, Slytherin, Ravenclaw, or Hufflepuff.**  
+   - Assign them to one of the four houses: **Emberclaw, Nightrune, Skyspire, or Thornmere.**  
    - Write a brief **character analysis** explaining what kind of wizard they are.  
 
 3. **Step 3: Return JSON Output**  

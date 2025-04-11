@@ -27,7 +27,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div className="text-left">
             <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl text-white mb-8 tracking-tight">
-              Wizarding Realms: The Arcane Duel
+              Wizard's Gambit: The Arcane Duel
             </h1>
 
             <p className="text-lg md:text-xl text-gray-300 max-w-2xl mb-12 font-light">

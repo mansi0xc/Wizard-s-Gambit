@@ -2,10 +2,11 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./RuneToken.sol";
+import "./Rune.sol";
 
-contract PlayerAvatarNFT is ERC721URIStorage, Ownable {
+contract PlayerAvatarNFT is ERC721URIStorage,ERC721Burnable, Ownable {
     Rune public rune;
     mapping(address => uint256) private _ownedToken;
     uint256 private _nextTokenId = 1;
@@ -61,5 +62,23 @@ contract PlayerAvatarNFT is ERC721URIStorage, Ownable {
         uint256 tokenId = _ownedToken[user];
         if (tokenId == 0) return (0, "");
         return (tokenId, tokenURI(tokenId));
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override(ERC721, ERC721URIStorage)
+        returns (string memory)
+    {
+        return super.tokenURI(tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721URIStorage)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }

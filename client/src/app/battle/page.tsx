@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { io, type Socket } from "socket.io-client"
 import { Shield, Flame, Snowflake, Wind, ArrowLeft, Heart, Users, Trophy, Wifi } from "lucide-react"
+import {BattleAddress,battleAbi} from "@/app/abi/final/Battle"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
@@ -20,6 +21,12 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { BattleCard } from "@/components/battle-card"
+// At the top of the file, add these imports:
+import { useAccount } from "wagmi"
+import { useWriteContract } from "wagmi"
+import { waitForTransactionReceipt } from "@wagmi/core"
+import { parseEther } from "viem"
+import { config } from "@/app/wagmi"
 
 // Types for our game state
 type Element = "inferno" | "glacius" | "ventus"
@@ -68,7 +75,7 @@ export default function BattlePage() {
   const [mySocketId, setMySocketId] = useState<string | null>(null)
   const [opponentSocketId, setOpponentSocketId] = useState<string | null>(null)
   const [playersInRoom, setPlayersInRoom] = useState<string[]>([])
-
+  const { writeContractAsync, isPending } = useWriteContract()
   // Battle state
   const [battleState, setBattleState] = useState<BattleState>({
     round: 1,
@@ -97,6 +104,15 @@ export default function BattlePage() {
   const [isWalletConnected, setIsWalletConnected] = useState(false)
   const [battleEnded, setBattleEnded] = useState(false)
   const [waitingForOpponentMove, setWaitingForOpponentMove] = useState(false)
+
+  //contract variables
+  const [rewardClaimed, setRewardClaimed] = useState(false)
+  const [claimingReward, setClaimingReward] = useState(false)
+  const [claimError, setClaimError] = useState<string | null>(null)
+  const [txHash, setTxHash] = useState<string | null>(null)
+
+  // Get account from wagmi
+  const { address } = useAccount()
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -201,6 +217,41 @@ export default function BattlePage() {
     }
   }, [customServerIp])
 
+  // Add this function to handle reward claiming
+  const handleClaimReward = async () => {
+    if (!address) {
+      addBattleLog("• Connect your wallet to claim rewards")
+      return
+    }
+
+    try {
+      setClaimingReward(true)
+      setClaimError(null)
+
+      // 1. Write to contract
+      const hash = await writeContractAsync({
+        abi: battleAbi,
+        address: BattleAddress,
+        functionName: "battle",
+        args: [address, parseEther("100")], // 100e18 tokens as reward
+      })
+
+      setTxHash(hash)
+      addBattleLog(`• Transaction submitted: ${hash.slice(0, 6)}...${hash.slice(-4)}`)
+
+      // 2. Wait for transaction confirmation
+      const receipt = await waitForTransactionReceipt(config,{ hash })
+
+      addBattleLog("• Successfully claimed 100 RUNE tokens!")
+      setRewardClaimed(true)
+      setClaimingReward(false)
+    } catch (error) {
+      console.error("Error claiming reward:", error)
+      setClaimError(error instanceof Error ? error.message : "Unknown error")
+      addBattleLog(`• Error claiming reward: ${error instanceof Error ? error.message : "Unknown error"}`)
+      setClaimingReward(false)
+    }
+  }
   // Helper function to add messages to battle log
   const addBattleLog = (message: string) => {
     setBattleState((prev) => ({
@@ -1148,6 +1199,35 @@ export default function BattlePage() {
           </div>
 
           <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            {battleWinner === "player" && !rewardClaimed && (
+              <Button
+                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                onClick={handleClaimReward}
+                disabled={claimingReward || !isWalletConnected}
+              >
+                {claimingReward ? "Claiming..." : "Claim 100 RUNE Tokens"}
+              </Button>
+            )}
+
+            {/* Show claim status */}
+            {(claimingReward || rewardClaimed || claimError) && (
+              <div className="w-full text-center py-2 mb-2">
+                {claimingReward && (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-sm text-gray-400">Processing transaction...</p>
+                  </div>
+                )}
+                {rewardClaimed && <p className="text-sm text-green-400">Reward claimed successfully!</p>}
+                {claimError && <p className="text-sm text-red-400">Error: {claimError}</p>}
+                {txHash && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    TX: {txHash.slice(0, 6)}...{txHash.slice(-4)}
+                  </p>
+                )}
+              </div>
+            )}
+
             <Button
               variant="outline"
               className="flex-1 bg-transparent border-gray-700 hover:bg-gray-800"
@@ -1164,6 +1244,7 @@ export default function BattlePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
 
       <script
         dangerouslySetInnerHTML={{

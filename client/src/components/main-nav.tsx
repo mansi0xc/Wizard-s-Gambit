@@ -3,9 +3,9 @@
 import Link from "next/link"
 import { useState } from "react"
 import { useAccount,useConfig,useReadContract } from "wagmi"
-import { RuneAbi,RuneAdress } from "../app/abi/RuneAbi"
+import { RuneAbi,RuneAddress } from "../app/abi/final/RuneAbi"
 import { usePathname } from "next/navigation"
-import { Wand2, BookOpen, Swords, User, Info, Award, Users } from "lucide-react"
+import { Wand2, BookOpen, Swords, User, Info, Award, Users,BadgeDollarSignIcon,Wand } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
@@ -18,7 +18,7 @@ export function MainNav() {
     error,
     refetch,
   } = useReadContract({
-    address: RuneAdress,
+    address: RuneAddress,
     abi: RuneAbi,
     functionName: 'balanceOf',
     args: [address],
@@ -38,9 +38,9 @@ export function MainNav() {
       icon: Wand2,
     },
     {
-      name: "Deck",
-      href: "/deck",
-      icon: BookOpen,
+      name: "Bet",
+      href: "/bet",
+      icon: BadgeDollarSignIcon,
     },
     {
       name: "Battle",
@@ -51,6 +51,11 @@ export function MainNav() {
       name: "Spellbook",
       href: "/spellbook",
       icon: BookOpen,
+    },
+    {
+      name: "items",
+      href: "/items",
+      icon: Wand,
     },
     {
       name: "Spectate",
@@ -80,7 +85,7 @@ export function MainNav() {
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <span className="text-2xl">✦</span>
-            <span className="font-serif text-lg font-medium hidden sm:inline-block">Wizarding Realms</span>
+            <span className="font-serif text-lg font-medium hidden sm:inline-block">Wizard's Gambit</span>
           </Link>
 
           <div className="flex items-center space-x-1 sm:space-x-2 overflow-x-auto scrollbar-hide">

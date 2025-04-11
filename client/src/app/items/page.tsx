@@ -1,27 +1,25 @@
-// "use client"
+"use client"
 
-// import { useState, useEffect } from "react"
-// import { useAccount } from "wagmi"
-// import { writeContract, waitForTransactionReceipt } from "@wagmi/core"
-// import { GameItemsAddress, GameItemsABI } from "../abi/GameItems"
-// import { config } from "../wagmi"
-// import { Loader2, FlameIcon as Fire, Wand, Sparkles, User } from "lucide-react"
-// import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-// import { Button } from "@/components/ui/button"
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-// import { Badge } from "@/components/ui/badge"
-
-
-// const baseurl = "https://scarlet-urgent-pig-985.mypinata.cloud/ipfs/"
+import { useState, useEffect } from "react"
+import { useAccount } from "wagmi"
+import { writeContract, waitForTransactionReceipt } from "@wagmi/core"
+import { GameItemsAddress, GameItemsABI } from "../abi/GameItems"
+import { config } from "../wagmi"
+import { Loader2, FlameIcon as Fire, Wand, Sparkles, User } from "lucide-react"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
 
 
-<<<<<<< HEAD
-=======
+const baseurl = "https://scarlet-urgent-pig-985.mypinata.cloud/ipfs/"
+
+
 const gameAssets = {
   // Element Cards (Fungible)
   elementCards: {
     // INFERNO_CARD: { id: 1001, uri: `${baseurl}bafkreibsx7ei4ylmelaa3ul7wt7jwcs6j6fuydwkpf5zcicinnooekziby` },
-    INFERNO_CARD: { id: 1001, uri: "ipfs://bafkreibsx7ei4ylmelaa3ul7wt7jwcs6j6fuydwkpf5zcicinnooekziby" },
+    INFERNO_CARD: { id: 1001, uri: `${baseurl}bafkreiafo4nxgvlsa3jxkwzkhygmwlq4kugv3sk5ulddq6rvevngtz3eba` },
     FROST_CARD: { id: 1002, uri: `${baseurl}bafkreiafo4nxgvlsa3jxkwzkhygmwlq4kugv3sk5ulddq6rvevngtz3eba` },
     TEMPEST_CARD: { id: 1003, uri: `${baseurl}bafkreicavagxqlqnchqdemey3imvurdjvkecjxtsf35tqzuxyo3dt3rnea` },
   },
@@ -149,7 +147,7 @@ export default function BuyItemsPage() {
       // Patronus
       for (const key in gameAssets.patronus) {
         fetchPromises.push(fetchAndCacheItem(gameAssets.patronus[key as keyof typeof gameAssets.patronus].uri))
-      }
+      } 
 
       // Professor Shards
       for (const key in gameAssets.professorShards) {
@@ -187,6 +185,10 @@ export default function BuyItemsPage() {
   async function handlemintElementCard(id: number, amount: number, uri: string) {
     try {
       setProcessingItem(`elementCard-${id}`)
+
+
+      uri = uri.replace(baseurl,"ipfs://")
+      console.log(uri)
       const result = await writeContract(config, {
         abi: GameItemsABI,
         address: GameItemsAddress,
@@ -334,7 +336,7 @@ export default function BuyItemsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 min-h-screen mt-20">
       <h1 className="text-3xl font-bold mb-6 text-center">Magical Items Shop</h1>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -703,7 +705,6 @@ export default function BuyItemsPage() {
 
 // const baseurl = process.env.url as string;
 
->>>>>>> 854742879bbb986127a6a5068a76cd7c999f8a55
 // const gameAssets = {
 //   // Element Cards (Fungible)
 //   elementCards: {
