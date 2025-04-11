@@ -10,14 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { ConnectWallet } from "@/components/connect-wallet"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
+import {Dialog,DialogContent,DialogDescription,DialogHeader,DialogTitle,DialogFooter} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { BattleCard } from "@/components/battle-card"
@@ -62,6 +55,17 @@ interface PlayerInfo {
   type: string
 }
 
+interface PlayerDetails {
+  patronus: string;
+  wand: string;
+  level: number;
+  opponent?: {
+    patronus: string;
+    wand: string;
+    level: number;
+  };
+}
+
 export default function BattlePage() {
   // WebSocket connection
   const socketRef = useRef<Socket | null>(null)
@@ -104,6 +108,7 @@ export default function BattlePage() {
   const [isWalletConnected, setIsWalletConnected] = useState(false)
   const [battleEnded, setBattleEnded] = useState(false)
   const [waitingForOpponentMove, setWaitingForOpponentMove] = useState(false)
+  const [playerDetails, setPlayerDetails] = useState<PlayerDetails | null>(null)
 
   //contract variables
   const [rewardClaimed, setRewardClaimed] = useState(false)
@@ -115,107 +120,7 @@ export default function BattlePage() {
   const { address } = useAccount()
 
   // Initialize WebSocket connection
-  useEffect(() => {
-    const wsServer = customServerIp
-      ? `http://${customServerIp}:3001`
-      : process.env.NEXT_PUBLIC_WS_SERVER || "http://localhost:3001"
-
-    // Connect to WebSocket server
-    const socket = io(wsServer, {
-      autoConnect: false,
-      reconnectionAttempts: 3,
-      reconnectionDelay: 1000,
-    })
-
-    socketRef.current = socket
-
-    // Event listeners
-    socket.on("connect", () => {
-      setIsConnected(true)
-      setMySocketId(socket?.id)
-      addBattleLog("• Connected to battle server")
-    })
-
-    socket.on("disconnect", () => {
-      setIsConnected(false)
-      addBattleLog("• Disconnected from battle server")
-    })
-    
-    
-
-    socket.on("room_joined", (data: { roomId: string; isSpectator: boolean }) => {
-      setRoomId(data.roomId)
-      setIsWaitingForOpponent(!data.isSpectator)
-      setIsSpectatorMode(data.isSpectator)
-      addBattleLog(`• Joined room ${data.roomId}`)
-      if (data.isSpectator) {
-        addBattleLog("• Entered spectator mode")
-      } else {
-        addBattleLog("• Waiting for opponent...")
-      }
-    })
-
-    socket.on("opponent_joined", () => {
-      setIsWaitingForOpponent(false)
-      addBattleLog("• Opponent has joined the battle!")
-    })
-
-    socket.on("spectator_count", (count: number) => {
-      setSpectatorCount(count)
-    })
-
-    socket.on("bet_update", (amount: number) => {
-      setTotalBetAmount(amount)
-    })
-
-    socket.on("room-players", (playerList: string[]) => {
-      setPlayersInRoom(playerList)
-
-      // Find opponent socket ID (the one that's not mine)
-      if (playerList.length === 2) {
-        const opponent = playerList.find((id) => id !== socket.id)
-        if (opponent) {
-          setOpponentSocketId(opponent)
-        }
-      }
-    })
-
-    socket.on("round_start", () => {
-      setWaitingForOpponentMove(false)
-      addBattleLog(`• Round ${battleState.round} begins! Choose your spell.`)
-    })
-
-    socket.on("round_result", (result: RoundResult) => {
-      handleRoundResult(result)
-      setWaitingForOpponentMove(false)
-    })
-
-    socket.on("battle_result", (winner: Player) => {
-      setBattleWinner(winner)
-      setBattleEnded(true)
-      setShowBattleResult(true)
-      addBattleLog(winner === "player" ? "• You won the battle!" : "• You lost the battle!")
-    })
-
-    socket.on("opponent_left", () => {
-      addBattleLog("• Opponent has left the battle")
-      setIsWaitingForOpponent(true)
-      setWaitingForOpponentMove(false)
-    })
-
-    socket.on("error", (message: string) => {
-      addBattleLog(`• Error: ${message}`)
-      setWaitingForOpponentMove(false)
-    })
-
-    // Connect to server
-    socket.connect()
-
-    // Cleanup on unmount
-    return () => {
-      socket.disconnect()
-    }
-  }, [customServerIp])
+  
 
   // Add this function to handle reward claiming
   const handleClaimReward = async () => {
@@ -303,7 +208,6 @@ export default function BattlePage() {
   const getLevelDamage = (level: SpellLevel): number => {
     return level === 1 ? 20 : level === 2 ? 25 : 30
   }
-
   // Handle round results from server
   const handleRoundResult = (result: RoundResult) => {
     setBattleState((prev) => {
@@ -409,6 +313,7 @@ export default function BattlePage() {
 
     // Add to battle log
     addBattleLog(`• You cast ${element} level ${level}${useDefense ? " with defense" : ""}`)
+    socketRef.current.emit("player_details", roomId);
     setWaitingForOpponentMove(true)
   }
 
@@ -524,6 +429,137 @@ export default function BattlePage() {
     if (!socketId) return "Unknown"
     return socketId.substring(0, 6) + "..." + socketId.substring(socketId.length - 4)
   }
+  useEffect(() => {
+    const wsServer = customServerIp
+      ? `http://${customServerIp}:3001`
+      : process.env.NEXT_PUBLIC_WS_SERVER || "http://localhost:3001"
+
+    // Connect to WebSocket server
+    const socket = io(wsServer, {
+      autoConnect: false,
+      reconnectionAttempts: 3,
+      reconnectionDelay: 1000,
+    })
+
+    socketRef.current = socket
+
+    // Event listeners
+    socket.on("connect", () => {
+      setIsConnected(true)
+      setMySocketId(socket?.id)
+      addBattleLog("• Connected to battle server")
+    })
+
+
+    socket.on("disconnect", () => {
+      setIsConnected(false)
+      addBattleLog("• Disconnected from battle server")
+    })
+    
+    socket.on("player_details_response", (data) => {
+      setPlayerDetails(data);
+      console.log("Player details received:", data);
+    });
+
+    socket.on("room_joined", (data: { roomId: string; isSpectator: boolean }) => {
+      setRoomId(data.roomId)
+      setIsWaitingForOpponent(!data.isSpectator)
+      setIsSpectatorMode(data.isSpectator)
+      addBattleLog(`• Joined room ${data.roomId}`)
+      if (data.isSpectator) {
+        addBattleLog("• Entered spectator mode")
+      } else {
+        addBattleLog("• Waiting for opponent...")
+      }
+    })
+
+    
+    socket.on("opponent_joined", () => {
+      setIsWaitingForOpponent(false)
+      addBattleLog("• Opponent has joined the battle!")
+      
+    })
+
+    socket.on("spectator_count", (count: number) => {
+      setSpectatorCount(count)
+    })
+
+    socket.on("bet_update", (amount: number) => {
+      setTotalBetAmount(amount)
+    })
+
+    socket.on("room-players", (playerList: string[]) => {
+      setPlayersInRoom(playerList)
+
+      // Find opponent socket ID (the one that's not mine)
+      if (playerList.length === 2) {
+        const opponent = playerList.find((id) => id !== socket.id)
+        if (opponent) {
+          setOpponentSocketId(opponent)
+        }
+      }
+    })
+
+    socket.on("round_start", () => {
+      setWaitingForOpponentMove(false)
+      addBattleLog(`• Round ${battleState.round} begins! Choose your spell.`)
+    })
+
+    socket.on("round_result", (result: RoundResult) => {
+      // Adjust the perspective based on our socket ID
+      const adjustedResult = {
+        ...result,
+        // If we're the "player" in the result, keep it, otherwise flip it
+        winner: result.winner === null ? null : 
+                result.winner === "player" ? 
+                  (playersInRoom[0] === mySocketId ? "player" : "opponent") :
+                  (playersInRoom[0] === mySocketId ? "opponent" : "player"),
+        damage: result.damage,
+        isVoid: result.isVoid
+      };
+      
+      handleRoundResult(adjustedResult);
+      setWaitingForOpponentMove(false);
+    });
+
+    socket.on("battle_result", (winner: Player) => {
+      setBattleWinner(winner)
+      setBattleEnded(true)
+      setShowBattleResult(true)
+      addBattleLog(winner === "player" ? "• You won the battle!" : "• You lost the battle!")
+    })
+
+    socket.on("opponent_left", () => {
+      addBattleLog("• Opponent has left the battle")
+      setIsWaitingForOpponent(true)
+      setWaitingForOpponentMove(false)
+    })
+
+    socket.on("error", (message: string) => {
+      addBattleLog(`• Error: ${message}`)
+      setWaitingForOpponentMove(false)
+    })
+
+    // Connect to server
+    socket.connect()
+
+    // Cleanup on unmount
+    return () => {
+      socket.disconnect()
+    }
+  }, [customServerIp])
+
+useEffect(()=>{
+  if(socketRef.current!==null){
+  socketRef.current.on("player_details_response", (data) => {
+  setPlayerDetails(data);
+  console.log("Player details received:", data);
+});
+}
+},[castSpell])
+
+
+
 
   return (
     <div className="min-h-screen bg-[#0a0a1a] text-gray-100 relative overflow-hidden pt-16">
@@ -831,7 +867,8 @@ export default function BattlePage() {
           {/* Player Side */}
           <div className="bg-gray-900/30 border border-gray-800 rounded-lg p-4 order-2 lg:order-1 lg:col-span-2">
             <div className="flex justify-between items-center mb-2">
-              <h2 className="font-serif text-xl">Your Wizard</h2>
+
+              <h2 className="font-serif text-xl">Your Wizard {!playerDetails?"dsss":"dbrbde"}</h2>
               <div className="text-xs text-gray-400">Level 42</div>
             </div>
 
@@ -848,7 +885,7 @@ export default function BattlePage() {
             <div className="flex flex-col items-center mb-4">
               <div className="w-24 h-24 bg-gradient-to-br from-purple-900/50 to-indigo-900/50 rounded-full mb-3 flex items-center justify-center border border-purple-500/30">
                 <Image
-                  src="/placeholder.svg?height=80&width=80"
+                  src="/Screenshot 2025-03-30 060411.png"
                   alt="Player Avatar"
                   width={80}
                   height={80}
@@ -857,7 +894,13 @@ export default function BattlePage() {
               </div>
               <div className="text-center">
                 <p className="font-medium">{formatSocketId(mySocketId)}</p>
-                <p className="text-xs text-purple-400">Phoenix Patronus • Elder Wand</p>
+                {playerDetails ? (
+                  <p className="text-xs text-purple-400">
+                    {playerDetails.patronus} • {playerDetails.wand}
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-400">Loading details...</p>
+                )}
               </div>
             </div>
 
@@ -865,10 +908,10 @@ export default function BattlePage() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span>Health</span>
-                  <span>{battleState.playerHealth}/100</span>
+                  <span>{playerDetails?.find((player)=>player.socketId===mySocketId).health ?? 100}/100</span>
                 </div>
                 <Progress
-                  value={battleState.playerHealth}
+                  value={playerDetails?.find((player)=>player.socketId===mySocketId).health ?? 100}
                   className="h-2 bg-gray-800"
                   indicatorClassName="bg-gradient-to-r from-purple-500 to-indigo-500"
                 />
@@ -926,7 +969,7 @@ export default function BattlePage() {
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-gradient-to-br from-purple-900/50 to-indigo-900/50 rounded-full flex items-center justify-center border border-purple-500/30">
                     <Image
-                      src="/placeholder.svg?height=30&width=30"
+                      src="/Screenshot 2025-03-30 060411.png"
                       alt="Player"
                       width={30}
                       height={30}
@@ -934,7 +977,7 @@ export default function BattlePage() {
                     />
                   </div>
                   <Progress
-                    value={battleState.playerHealth}
+                    value={playerDetails?.find((player)=>player.socketId===mySocketId).health ?? 100}
                     className="w-24 h-1.5 bg-gray-800 ml-2"
                     indicatorClassName="bg-gradient-to-r from-purple-500 to-indigo-500"
                   />
@@ -942,13 +985,13 @@ export default function BattlePage() {
 
                 <div className="flex items-center">
                   <Progress
-                    value={battleState.opponentHealth}
+                    value={playerDetails?.find((player)=>player.socketId!==mySocketId).health ?? 100}
                     className="w-24 h-1.5 bg-gray-800 mr-2"
                     indicatorClassName="bg-gradient-to-r from-red-500 to-rose-500"
                   />
                   <div className="w-8 h-8 bg-gradient-to-br from-red-900/50 to-orange-900/50 rounded-full flex items-center justify-center border border-red-500/30">
                     <Image
-                      src="/placeholder.svg?height=30&width=30"
+                      src="/Screenshot 2025-03-30 060503.png"
                       alt="Opponent"
                       width={30}
                       height={30}
@@ -1034,7 +1077,7 @@ export default function BattlePage() {
             <div className="flex flex-col items-center mb-4">
               <div className="w-24 h-24 bg-gradient-to-br from-red-900/50 to-orange-900/50 rounded-full mb-3 flex items-center justify-center border border-red-500/30">
                 <Image
-                  src="/placeholder.svg?height=80&width=80"
+                  src="/Screenshot 2025-03-30 060503.png"
                   alt="Opponent Avatar"
                   width={80}
                   height={80}
@@ -1043,7 +1086,13 @@ export default function BattlePage() {
               </div>
               <div className="text-center">
                 <p className="font-medium">{formatSocketId(opponentSocketId) || "Waiting for opponent..."}</p>
-                <p className="text-xs text-red-400">Wolf Patronus • Dragon Heartstring Wand</p>
+                {playerDetails?.opponent ? (
+                  <p className="text-xs text-red-400">
+                    {playerDetails.opponent.patronus} • {playerDetails.opponent.wand}
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-400">Waiting for opponent details...</p>
+                )}
               </div>
             </div>
 
@@ -1051,10 +1100,10 @@ export default function BattlePage() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span>Health</span>
-                  <span>{battleState.opponentHealth}/100</span>
+                  <span>{playerDetails?.find((player)=>player.socketId!==mySocketId).health ?? 100}/100</span>
                 </div>
                 <Progress
-                  value={battleState.opponentHealth}
+                  value={playerDetails?.find((player)=>player.socketId!==mySocketId).health ?? 100}
                   className="h-2 bg-gray-800"
                   indicatorClassName="bg-gradient-to-r from-red-500 to-rose-500"
                 />
@@ -1269,3 +1318,4 @@ export default function BattlePage() {
     </div>
   )
 }
+
